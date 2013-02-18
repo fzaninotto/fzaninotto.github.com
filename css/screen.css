@@ -91,7 +91,7 @@ ul.posts {
 
 header {
   text-align: left;
-  background: #252525;
+  background: #252525 url('/images/pw_maze_black.png');
   border-right: solid 1px #000;
   bottom: 0;
   left: 0;
