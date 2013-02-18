@@ -1,0 +1,178 @@
+---
+layout: post
+title: Functional Testing For Node.js Using Mocha and Zombie.js
+published: true
+tags:
+- agile
+- NodeJS
+excerpt: In Agile development, developers write tests before the implementing a feature. Unit tests should already be in your ADN, so let's talk about functional tests instead. Functional tests are the technical translation of the acceptance tests written by the customer at the back of a user story card. Let's see how to achieve functional testing for Node.js applications.
+---
+<p>In Agile development, developers write tests before the implementing a feature. Unit tests should already be in your ADN, so let's talk about <strong>functional tests</strong> instead. Functional tests are the technical translation of the acceptance tests written by the customer <a href="http://www.agilemodeling.com/artifacts/userStory.htm#Detailing">at the back of a user story card</a>. Let's see how to achieve functional testing for Node.js applications.</p>
+<h2>Contact Should Be Easy</h2>
+<p>The customer wants a contact page. She wrote the following User Story:</p>
+<p style="padding-left: 30px;">As a user,<br />Given I found the contact page,<br />I want to fill in my contact information and message,<br />and have it sent to the site owner.</p>
+<p>Here is the mockup associated with the story:</p>
+<p><img src="/images/contact.png" alt="Functional Testing For Node.js Using Mocha and Zombie.js" /></p>
+<p>While discussing this story with the customer during a <a href="http://en.wikipedia.org/wiki/Planning_poker">planning poker</a>, the team lists the acceptance tests that the application should pass to validate the user story:</p>
+<ul>
+<li>The contact page should show a contact form</li>
+<li>The contact page should refuse empty submissions</li>
+<li>The contact page should refuse partial submissions</li>
+<li>The contact page should keep values on partial submissions</li>
+<li>The contact page should refuse invalid emails</li>
+<li>The contact page should accept complete submissions</li>
+</ul>
+<p>You could rush to implement the contact page requirements, and then check the acceptance tests by hand with a web browser. But that wouldn't be very agile.<!--more--></p>
+<h2>Write Tests First</h2>
+<p>In test-driven development, you should write tests first. Let's bootstrap a file called <code>test/functional/contact.js</code>:</p>
+<p><script src="https://gist.github.com/96acc30f3a46c719f63b.js"></script></p>
+<p>If this looks exactly like the acceptance tests written above, that's for a reason. This first step could, in theory, be achieved directly by the Product Owner, because it requires no knowledge of anything technical.</p>
+<p>Next, run the tests. That's write, even before you write the first line of the actual contact page, you should run the tests. This tutorial uses <a href="http://visionmedia.github.com/mocha/">the <code>mocha</code> test framework</a>, so either add it to your <code>package.json</code> in the <code>devDependencies</code> section, or better, install it globally once and for all:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ npm install -g mocha</pre></div>
+</div>
+
+<p>Now you can run the new (empty) functional test:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ mocha test/functional/contact.js
+
+  ......
+
+  ✔ 6 tests complete (2ms)
+  • 6 tests pending</pre></div>
+</div>
+
+<p>So far, so good: all the tests are pending.</p>
+<h2>Functional Tests as The Application Specification</h2>
+<p>Before implementing the functional tests, let's switch to another way to output mocha tests results: the "spec" reporter. To do so, either add the <code>--reporter spec</code> option when calling the <code>mocha</code> command, or even better, add it to the <code>test/mocha.opts</code> file and you'll never have to add it again. And since you're adding command line options for mocha, opt for the <code>--recursive</code> option, which tells mocha to look for JavaScript files with <code>describe()</code> statements under the whole <code>test/</code> folder hierarchy.</p>
+<div class="CodeRay">
+  <div class="code"><pre>--reporter spec
+--recursive</pre></div>
+</div>
+
+<p>Now running the test is easier (no need to specify the test to run) and takes a whole new dimension:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ mocha
+
+  contact page
+    - should show a contact form
+    - should refuse empty submissions
+    - should refuse partial submissions
+    - should keep values on partial submissions
+    - should refuse invalid emails
+    - should accept complete submissions
+
+
+  ✔ 6 tests complete (2ms)
+  • 6 tests pending</pre></div>
+</div>
+
+<p>The "spec" reporter takes advantage of the <code>describe()</code> and <code>it()</code> descriptions to display a nicely formatted list of application requirements. That way, you can even let the Product owner look at the test results, and the tests document the code.</p>
+<h2>Set Up The Application</h2>
+<p>Functional tests should browse a special version of the web application - the "test" application. This version should use test data, test configuration, and should not interfere with the development or production versions. A good practice is to setup test data and start a new instance of the application inside each functional test. The ideal place to put the related code in is the <code>before()</code> function, that mocha executes... before the tests. And of course, don't forget to close the application test instance when the test ends.</p>
+<p><script src="https://gist.github.com/b4b95c2939caad122469.js"></script></p>
+<p><strong>Tip</strong>: The <code>before()</code> function starts the server on a custom port, to avoid side effects on the development version of the application. In order to allow a Node.js server script to be started by functional tests, it should be exported as a module, and start (or "listen") only when called directly. This is how the main <code>server.js</code> file should end:</p>
+<p><script src="https://gist.github.com/ed106b8b5c5fe5828bd9.js"></script></p>
+<p><strong>Tip</strong>: If you want to use different configuration values for the test environment, you should use an environment-aware configuration utility. I recommend the excellent <a href="https://github.com/lorenwest/node-config">config</a> module for that purpose.</p>
+<h2>Set Up The Browser</h2>
+<p>Functional tests are scenarios mimicking the actions of a user through a browser. You'll need a simple browser for the contact page tests. In fact, a headless browser (without GUI) with limited JavaScript capabilities should do the trick. That's exactly what <a href="http://zombie.labnotes.org/">zombie.js</a> is, and it's the perfect tool for the job.</p>
+<p>Add <code>zombie</code> to the <code>package.json</code> file:</p>
+<p><script src="https://gist.github.com/6f3b3760ebd58fd9bb2c.js"></script></p>
+<p>Then install it (with <code>npm install</code>) and edit the contact functional test file again:</p>
+<p><script src="https://gist.github.com/b6d7649629341f7b66d1.js"></script></p>
+<p>You can add as many <code>before()</code> calls as you wish in a functional test; mocha executes them in series. The second <code>before()</code> call is asynchronous - you can tell from the <code>done</code> callback passed as parameter to the <code>before()</code> argument function. In this function, the browser's <code>visit()</code> method loads the contact page, waits for the page to fully load and process events, and then calls the <code>done</code> callback function - allowing mocha to start actual tests.</p>
+<h2>The Very First Test</h2>
+<p>A functional test is a simple callback function. Mocha considers the test as valid if the function doesn't throw any error. You can either test assertions manually and throw errors upon unexpected result, or use an assertion module. Node.js comes with <a href="http://nodejs.org/api/assert.html">the <code>assert</code> module</a>, which is more than enough for the contact page functional tests.</p>
+<p><script src="https://gist.github.com/f939ebd48c09dcf29c96.js"></script></p>
+<p>These three assertions are pretty basic. They check that the page returns an HTTP code 200, that it's actually the contact page, and that it contains a form with several fields labeled as in the mockup. The Zombie browser&nbsp;<code>text()</code> function takes a CSS selector as argument, and returns the text of the matching element(s) in the DOM. It's a very straightforward way to implement functional tests assertions.</p>
+<p>Now that the test suite has one real test, it's time to run it:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ mocha
+
+  contact page
+    1) should show a contact form
+    - should refuse empty submissions
+    - should refuse partial submissions
+    - should keep values on partial submissions
+    - should refuse invalid emails
+    - should accept complete submissions
+
+
+  ✖ 1 of 6 tests failed:
+
+  1) contact page should show a contact form:
+     Error:...</pre></div>
+</div>
+
+<p>The test fails, which is normal. The page content doesn't exist yet. You should always check that a test fails if the implementation is wrong, and running a test <em>before</em> actually starting the implementation is the best way.</p>
+<p>The implementation of the contact form is left as an exercise to the reader. Depending on the framework and templating engine you use, this implementation may vary a lot. But you have one obligation: it must pass the test. That means that once the implementation is finished, running the test should yield the following result:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ mocha
+
+  contact page
+    ✓ should show a contact form
+    - should refuse empty submissions
+    - should refuse partial submissions
+    - should keep values on partial submissions
+    - should refuse invalid emails
+    - should accept complete submissions
+
+
+  6 tests complete (20 ms)
+  5 tests pending</pre></div>
+</div>
+
+<h2>Asynchronous Tests</h2>
+<p>The second test should check that an empty form submission displays the form again with an error. Whether you choose to implement this client-side or server-side (you should do both), this implies interacting with the contact form. The Zombie browser provides <a href="http://zombie.labnotes.org/API">a full-featured API to interact with page content</a>, including pressing a submit button via <code>pressButton()</code>:</p>
+<p><script src="https://gist.github.com/963429d227817c4bba62.js"></script></p>
+<p>The <code>pressButton()</code> method is asynchronous ; it presses the button, submits the form, loads the server response, and executes all browser events until there is no one left. That's why it takes a callback as parameter - and also why the enclosing mocha test must be considered asynchronous as well. Therefore, the mocha <code>it()</code> test uses a <code>done</code> callback to be called when the test is finished. Mocha deals with asynchronous functions in <code>it()</code> just like in <code>before()</code>.</p>
+<p>Apparently, this test works fine. However, if any of the assertions ever fails, then the execution flow of the <code>pressButton()</code> callback stops, and&nbsp;<code>done()</code>&nbsp;never gets called. So Mocha will report the page as timed out, even though the problem is of another nature.</p>
+<p>Zombie supports <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises</a> (powered by <a href="http://documentup.com/kriskowal/q">q</a>) to overcome this problem. Promises propagate errors implicitly to the last call, and therefore are compatible with tests. Here is how to rewrite the previous test using Promises:</p>
+<p><script src="https://gist.github.com/ec7d978a8cf5df64669b.js"></script></p>
+<p>Now if one of the assertion fails and throws an error, the error gets caught in the first&nbsp;<span style="font-family: monospace;">then()</span>, then passed passed to the second&nbsp;<code>then()</code>&nbsp;as argument to the first callback, resulting in <code>done(error)</code>. Mocha will consider the test failed. If no error is thrown, the second callback passed to the last <code>then()</code> will be called with no argument at all, resulting in <code>done()</code>. Mocha will consider the test passed.</p>
+<p>The <code>then(done, done)</code> construction may seem weird at first sight, but it's an efficient way to use the same callback for error and success, and it's <a href="http://zombie.labnotes.org/#Believing">the official way to make zombie and mocha work together</a>.</p>
+<h2>Getting Things Done</h2>
+<p>Now that you know how to do asynchronous tests with mocha and zombie.js, it should not be hard to deal with the rest of the tests:</p>
+<p><script src="https://gist.github.com/43f420d082d0884c94d9.js"></script></p>
+<p>Run the new tests. They should fail. Now you just need to implement enough server-side logic to make the tests pass:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ mocha
+
+  contact page
+    ✓ should show a contact form
+    ✓ should refuse empty submissions (207ms)
+    ✓ should refuse partial submissions (138ms)
+    ✓ should keep values on partial submissions (142ms)
+    ✓ should refuse invalid emails (142ms)
+    ✓ should accept complete submissions (143ms)
+
+  6 tests complete (1 seconds)</pre></div>
+</div>
+
+<p>And you're done! Or are you?</p>
+<h2>Your Tests Are Wrong</h2>
+<p>You think these tests are correct? Try to change the order in which they are implented by placing the last one first, and run the suite again:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ mocha
+
+  contact page
+    ✓ should accept complete submissions (191ms)
+    1) should show a contact form
+    2) should refuse empty submissions
+    3) should refuse partial submissions
+    4) should keep values on partial submissions
+    5) should refuse invalid emails
+
+  ✖ 5 of 6 tests failed:
+     ...</pre></div>
+</div>
+
+<p>The first test passes, but all the subsequent tests fail. Why? It's simple: the <code>before()</code> page loads the contact form once and for all. The test "the contact form should accept complete submissions" changes the browser page to the "message sent" page, where the contact form is nowhere to be found. Logically, all the subsequent tests fail because they try to submit a form which doesn't exist.</p>
+<p>The solution? Rename the <code>before()</code> step loading the form to <code>beforeEach()</code>, so that mocha reloads the contact form before running each <code>it()</code> statement.</p>
+<p>So here is the final contact page functional test:</p>
+<p><script src="https://gist.github.com/f13ce17fc15c532d00a4.js"></script></p>
+<p>I'm sure you can write a contact form which satisfies all these tests. But how about testing the fact that the contact form really sends an email to the site owner's address? Well, read again the beginning of this post: the Product Owner never wrote such an acceptance test, so it's another story. Or, it could be a supporting argument for another post labelled "why developers should help product owners write acceptance tests".</p>
+<h2>You Should Do Tests</h2>
+<p>Asynchronicity aside, writing functional tests in Node.js is quite simple. Using the assert module, mocha, and zombie.js, you should be able to implement most of the scenarios imagined by the product owner, and never do a manual browser test again.</p>
+<p>However, be aware of certain limits. Zombie.js is not a real browser, so it may behave differently that your (headed) desktop browser. When dealing with complex client-side JavaScript, you should probably replace zombie.js by <a href="http://phantomjs.org/">phantomjs</a>, which is a fully functional webkit browser. The only problem is that it's also much slower than zombie.js, and that it comes with its own JavaScript execution stack.</p>
+<p>And despite the relative youth of the Node.js stack, this post shows that Node is already compatible with a test-driven development workflow, and with agile methodologies. So don't wait, jump on the bandwagon!</p>

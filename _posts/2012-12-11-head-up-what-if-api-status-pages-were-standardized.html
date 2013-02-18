@@ -1,0 +1,62 @@
+---
+layout: post
+title: "Head Up: What If API Status Pages Were Standardized?"
+published: true
+excerpt: How can developers safely rely on third-party web services without sacrificing their own SLA? Once you start using an API, you must monitor it. Unfortunately, there is no standard way of doing so. Perhaps it's time to ask SaaS providers to be transparent about their health status.
+---
+<p>How can developers safely rely on third-party web services without sacrificing their own SLA? Once you start using an API, you must monitor it. Unfortunately, there is no standard way of doing so. Perhaps it's time to ask SaaS providers to be transparent about their health status.</p>
+<p><img src="/images/Twitter_API_Status.png" alt="Head Up: What If API Status Pages Were Standardized?" /></p>
+<h3>The problem</h3>
+<p>Web applications use more and more third-party web services. In production, they are used for analytics, log storage, A/B testing, comments, search, emailing, media, queuing, etc. In development, it's for version control, automated build, backup, authentication, you name it. Using third-party web services accelerates development, but it also weakens applications. Indeed, an outage in one of the services may cause an outage of the whole application.</p>
+<p>Developers must implement failure scenarios for when third-party services fail. But they must also monitor these services to be notified whenever one breaks. And this is where the problem begins: each service provider offers a different way to determine its API status - if any.<!--more--></p>
+<h3>The State Of The Art</h3>
+<p>Most services don't provide any specific health check functionality at all. You just have to trust their capacity to be up 100% of the time. Those providing status information do so for humans, not for machines. Their status page usually shows a history of recent outages, and gives an overall status for the platform. Each service reports status and uptime in a different way. For instance, compare the following status pages:</p>
+<ul>
+<li>Twitter API Status: <a href="https://dev.twitter.com/status">https://dev.twitter.com/status</a></li>
+<li>Google Apps Status: <a href="http://www.google.com/appstatus">http://www.google.com/appstatus</a></li>
+<li>WebSolr Status: <a href="https://twitter.com/websolrstatus">websolrstatus Twitter account</a>.</li>
+<li>GitHub Status: <a href="https://status.github.com">https://status.github.com</a></li>
+</ul>
+<p>This kind of page is where you go when you already believe that a service has a problem. These pages don't help to detect outages, but only to confirm them. If you need to make sure such a service is up and running, and receive notifications when it's not, you must identify which resources are critical for your usage, and ping these resources regularly. The status pages don't make this task easier - unless you want to do web scraping to get uptime data from HTML.</p>
+<p>Some services understand this requirement, and also provide a status <em>resource</em>, designed for machines. For instance, here is the type of response returned by the <a href="https://github.com/blog/1348-github-system-status-api">recently released GitHub Status API</a>:</p>
+<div class="CodeRay">
+  <div class="code"><pre>GET /api/status.json
+Host: status.github.com
+
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+Content-Length: 55
+{&quot;status&quot;: &quot;good&quot;,&quot;last_updated&quot;:&quot;2012-12-11T08:14:17Z&quot;}</pre></div>
+</div>
+
+<p>Unfortunately, there are too few of these service status APIs. Worse: the few services offering such an API all have a different interface.</p>
+<h3>I Have A Dream</h3>
+<p>It would be fabulous if all third-party web services provided a standardized API to let monitoring systems check their health status. The basic requirements for this API are: simple to request, with a response easy to decode programmatically, and a low HTTP footprint.</p>
+<p>Monitoring systems need to know if a resource is fully operational, and when the last health check was made. This can easily be expressed by answering a <code>GET</code> request, something like:</p>
+<div class="CodeRay">
+  <div class="code"><pre>GET /up HTTP/1.1
+Host: www.example.com</pre></div>
+</div>
+
+<p>If the server returns HTTP status 200, it means that the system is up and running. The <code>Last-Modified</code> header is the perfect place to mention the last time the system actually checked its own health.</p>
+<div class="CodeRay">
+  <div class="code"><pre>HTTP/1.1 200 OK
+Last-Modified: Sun, 09 Dec 2012 14:11:45 GMT</pre></div>
+</div>
+
+<p>Any other response type (500, timeout...) means that the system suffers an outage to some extend. A 404 response means that the provider didn't implement any status resource for machines.</p>
+<p>What's in the response body is entirely up to the service provider. An HTML report, a JSON object, and XML document... I don't think the body requires standardization, since all the necessary information for machines is already in the HTTP response header. In fact, to make things even simpler, since the response doesn't need a body, a <code>HEAD</code> request is enough for machines. Let's keep <code>GET</code> for browser and humans.</p>
+<div class="CodeRay">
+  <div class="code"><pre>HEAD /up HTTP/1.1
+Host: www.example.com
+
+HTTP/1.1 200 OK
+Last-Modified: Sun, 09 Dec 2012 14:11:45 GMT</pre></div>
+</div>
+
+<p>How should a given service check for its own health? Implementation is the service's responsibility. A genuine health check should imply a remote monitoring tool like <a href="https://www.pingdom.com/">Pingdom</a> or my own <a href="http://fzaninotto.github.com/uptime/">Uptime</a>. The information can also come from a user-centric analytics service like <a href="http://www.google.com/analytics/">Google Analytics</a>. Alternately, a server-side script checking the availability of internal infrastructure components (database, storage, web server, cpu...) could do the trick. However, this resource should always be dynamic, and provide honest feedback on the service status from a customer's point of view.</p>
+<p>We don't need anything more. If all the web services we use in our web applications could provide this <code>HEAD /up</code> resource, monitoring them all would be easy, and adding a new dependency to yet another service wouldn't require reinventing the wheel.</p>
+<h3>Can We Talk About It?</h3>
+<p>I would love the <code>HEAD /up</code> resource, or something similar, to become broadly available, just like <code>robots.txt</code>, or <code>favicon.ico</code>. If you run a SaaS provider, in my opinion, you should provide such a tool to your customers.</p>
+<p>I've written a <a href="https://github.com/fzaninotto/Head-Up"><code>Head-Up</code> Request For Comments on GitHub</a>. If you feel concerned about this problem, whether from a customer point of view or from a SaaS provider point of view, please come and discuss in the related <a href="https://groups.google.com/d/forum/head-up"><code>Head-Up</code> Google Group</a>. There are a lot of things you may want to discuss: serving the <code>/up</code> resource from a cookie-less subdomain, adding more health status information as response to a <code>GET /up</code> request, providing this data in JSON or XML... The discussion could last for a long time. Or, as we all have jobs, we could work towards a quick and pragmatic consensus on a very small set of features, and let the implementations start quickly.</p>
+<p>If an agreement was ever found, that would be for the greater good. I can imagine new services aggregating and comparing health status information from many APIs in a smart way (like <a href="http://api-status.com/">api-status.com</a> but with a larger selection of services). The net effect would probably be to increase the general quality of service of SaaS platforms. All right, I'm dreaming. But if you share the same dream, I'm looking forward to your support!</p>

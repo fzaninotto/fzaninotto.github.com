@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Screenshot-As-A-Service Now In Beta: Test The REST Service Online For Free"
+published: true
+tags:
+- JavaScript
+- NodeJS
+- open source
+---
+<p>
+<p>Recently at eTF1, we needed a REST screenshot service to display the home page of some competing services in a web dashboard. There are many cheap services offering APIs to take a picture of a rendered page. But sometimes, cheap is too expensive when it&rsquo;s cheaper to do it yourself. Also, you may need such a service behind your firewall, in order to test websites that are not public, or to integrate the screenshot component in your Service Oriented Architecture.</p>
+<p>Fortunately, and thanks to Node.js and phantomjs, building a remote screenshot service is easy.&nbsp;Today, I&rsquo;m introducing <a href="https://github.com/fzaninotto/screenshot-as-a-service">screenshot-as-a-service</a>, an open-source project that does exactly what the title says: a web server that takes screenshot.</p>
+<p><span><!--more-->And before diving into the code, you may want to test it yourself, so go directly to: </span></p>
+<p><a href="http://screenshot.etf1.fr/">http://screenshot.etf1.fr</a></p>
+<p><span>You will get instructions on how to use the service. The API is extremely simple: just add ?url=[YOUR_SITE_URL] to the domain and you&rsquo;ll get the screenshot in return. For instance, try this one to get the latest trending repositories on GitHub:</span></p>
+<p><a href="http://screenshot.etf1.fr/?url=github.com/explore"><span>http://screenshot.etf1.fr/?url=github.com/explore</span></a></p>
+<p><span>There are many more options, for instance to disable JavaScript, crop the screenshot, or use a specific user agent. If you don&rsquo;t like reading usage manuals, use the <a href="http://screenshot.etf1.fr/form.html">web form</a>&nbsp;instead, which I took a screenshot of</span>&nbsp;(inception!):</p>
+<p><span><img src="/images/screenshot_form.png" alt="Screenshot-As-A-Service Now In Beta: Test The REST Service Online For Free" /></span></p>
+<p>If you need the code for a Node.js client to use this service, <a href="https://github.com/fzaninotto/screenshot-as-a-service/blob/master/example/client.js">we&rsquo;ve got you covered</a>.</p>
+<p><span>Just one last word: screenshot-as-a-service introduces a unique feature that no other online screenshot service offers, and it&rsquo;s <em>asynchronous screenshots</em>. Usually, taking a screenshot takes several seconds, and you may not want to keep a connection to the service open while it does the screenshot. With screenshot-as-a-service, you can configure a callback url that gets called when the screenshot is done, using a POST request and the image in the body.</span></p>
+<p><span>The </span><a href="http://screenshot.etf1.fr/"><span>http://screenshot.etf1.fr</span></a> <span>URL is hosted on a test server, without any commitment on SLA, so don&rsquo;t build up a third-party service on it! It is, in fact, a way to gather feedback about the product. If you find it useful, if you want to improve it, head to <a href="https://github.com/fzaninotto/screenshot-as-a-service">the project on GitHub</a> to become a contributor!&nbsp;</span></p>
+</p>

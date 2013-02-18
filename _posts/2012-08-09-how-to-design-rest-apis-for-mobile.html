@@ -1,0 +1,61 @@
+---
+layout: post
+title: How to Design REST APIs for Mobile?
+published: true
+tags:
+- development
+- rest
+---
+<p>A <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">RESTful</a> API exposes a list of resource representations. This architecture often creates APIs that are quite close to the business model. While this can be fine to avoid duplication, it forces clients of the APIs to make several requests in order to get all the data they need to fulfill a given task. On mobile networks, where latency is constantly high, this is a big drawback. So how can you design an API following REST principles, without forcing the clients to make too many requests?<img src="/images/netflix-iphone.jpg" alt="How to Design REST APIs for Mobile?" /></p>
+<h3>A Simple REST API</h3>
+<p>Let's take an example: a mobile bookstore application offers a search feature, where the user can look for books by author name. <!--more-->The mobile application uses a REST API provided by a bookstore web service, exposing data on authors and books. Here is the list of API calls the application needs to show the list of books written by authors named "Tol*":</p>
+<p><script src="https://gist.github.com/caf3d55572f83bd5d867.js"></script></p>
+<p>The data set is simplified, but you get the idea: the number of HTTP requests necessary to build the response on the application side is proportional to the number of responses to the first request.</p>
+<p>If the application was talking with a database, the solution would be simple: use a JOIN to retrieve data from the <code>book</code> table associated with the results from the <code>author</code> table. But this is REST, not SQL, and there is no such thing as join. What convention would you follow to allow denormalization of related results?</p>
+<h3>Expand: A Consensus, But Not A Standard</h3>
+<p>REST is not a normalized standard, and only answers partially to the requirements of web service design. There has been other attempts at normalizing data exchange between servers. One of them, backed by Microsoft, is called <a href="http://www.odata.org/">OData</a>, or Open Data Protocol. OData goes way beyond the simple architectural principles of REST, and gives a convention to the solve the denormalization problem: <a href="http://www.odata.org/developers/protocols/uri-conventions#ExpandSystemQueryOption"><code>$expand</code></a>. Examples from the OData documentation show this in practice:</p>
+<div class="CodeRay">
+  <div class="code"><pre>http://services.odata.org/OData/OData.svc/Categories?$expand=Products
+http://services.odata.org/OData/OData.svc/Categories?$expand=Products/Suppliers</pre></div>
+</div>
+
+<p>The <code>$</code> prefix is another convention from the OData protocol to denote "System Query Options". It is widely used to provide filtering, ordering and more, somehow following the SQL path. For instance, an OData HTTP request can look like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre>http://services.odata.org/Northwind/Northwind.svc/Customers?$filter=tolower(CompanyName) eq 'foobar'
+&amp;select=FirstName,LastName&amp;$orderby=Name desc&amp;$format=json</pre></div>
+</div>
+
+<p>This is not a RESTful representation (note the <code>&amp;$format=json</code>), and it's probably exposing too much filtering options for a simple REST service. But the <code>$expand</code> option fits the need.</p>
+<p>Some true RESTful web services providers also offer an <code>expand</code> option. NetFlix, for instance, uses it for <a href="http://developer.netflix.com/docs/REST_API_Conventions#0_86160">title expansion</a>. An example from the NetFlix documentation is shown below:</p>
+<div class="CodeRay">
+  <div class="code"><pre>http://api-public.netflix.com/catalog/titles/series/70023522?expand=cast,directors</pre></div>
+</div>
+
+<p>JIRA uses the same convention for its <a href="http://docs.atlassian.com/jira/REST/latest/#expansion">REST API</a>:</p>
+<div class="CodeRay">
+  <div class="code"><pre>https://jira.atlassian.com/rest/api/latest/issue/JRA-9?expand=names,renderedFields</pre></div>
+</div>
+
+<p>Following the <code>expand</code> convention to do a JOIN equivalent in a REST API seems like a good idea. So, for the bookstore example, that would give the following:</p>
+<p><script src="https://gist.github.com/ef20c2b04deed05d44b3.js"></script></p>
+<p>And now the mobile application only needs one HTTP request to retrieve all the necessary information to display the search results page.</p>
+<p>Note that the&nbsp;<span style="font-family: monospace;">expand&nbsp;</span>parameter is not really a consensus. Some architects suggest <a href="http://www.stereoplex.com/blog/mobile-api-design-thinking-beyond-rest">using the&nbsp;<span style="font-family: monospace;">Accept</span>&nbsp;&nbsp;HTTP header</a> to achieve the same goal.</p>
+<h3>How About HATEOAS?</h3>
+<p>You're probably aware that designing URIs like <code>/authors/1234/books</code> isn't sufficient to make an API RESTFUL. To reach the glory of REST and get to level 3 of <a href="http://martinfowler.com/articles/richardsonMaturityModel.html">Richardson Maturity Model</a>, you must achieve Hypertext As The Engine Of Application State (HATEOAS). Check <a href="http://www.slideshare.net/Wombert/designing-http-interfaces-and-restful-web-services-sfliveparis2012-20120608">David Zuelke's excellent presentation about RESTful web services</a> for details.</p>
+<p>Let's switch to XML as there is now a broadly accepted convention on implementing HATEOAS in this language (there is not yet one in JSON). It may be more verbose than JSON, but every client library can decode XML natively nowadays. The initial REST API, exposing resources using HTTP verbs, reaches Level 2 of the RMM:</p>
+<p><script src="https://gist.github.com/5fae6f5349b90b5dcfff.js"></script></p>
+<p>HATEOAS suggests using links to allow clients to discover locations and operations. That way, URLs can change without breaking every client application.</p>
+<p>An <code>author</code> resource should therefore expose links about itself, and related resources:</p>
+<p><script src="https://gist.github.com/d1af2b2482be31d4a3c8.js"></script></p>
+<p>How does <code>expand</code> fit in this syntax? Just like NetFlix, you should expand the <code>&lt;link&gt;</code> tag using the same <code>rel</code> attribute as the <code>expand</code> parameter value, and put the related data inside it:</p>
+<p><script src="https://gist.github.com/3a28bae2004121edbceb.js"></script></p>
+<p>Note the use of the <code>&lt;link rel="self"&gt;</code> tag even on <code>book</code> to always reference the canonical URL for a given resource.</p>
+<h3>More Complex Expansions</h3>
+<p>Expanding one sub-element is quite simple, but how would you ask for a list of authors embedding author books, reviews and sales on author books, and biographical data on authors? The <code>expand</code> parameter can accept several fields separated by commas (","), and the object hierarchy can be traversed using dot notation ("."). So the request would look like:</p>
+<div class="CodeRay">
+  <div class="code"><pre>GET /authors?name=Tol*&amp;expand=books,books.reviews,books.sales,bioData</pre></div>
+</div>
+
+<p>With this convention, virtually every page of a mobile application can be reconstituted based on the response from one single request to the API, minimizing network traffic and latency. It's the API application responsibility to know what type of JOIN and <code>expand</code> must be translated to.</p>
+<h3>Conclusion</h3>
+<p>REST and Mobile are not enemies. Instead of leaving REST to craft your own custom denormalized API for mobile applications, offer the <code>expand</code> option. That way, both web and mobile may use the same API, with optimal performance. As for the implementation, as long as relationships between model objects are clearly defined in your code, it's a piece of cake. And if you happen to use an ORM or an ODM, offering the <code>expand</code> options won't be a problem.</p>

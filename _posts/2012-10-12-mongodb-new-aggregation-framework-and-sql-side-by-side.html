@@ -1,0 +1,610 @@
+---
+layout: post
+title: MongoDB New Aggregation Framework And SQL side-By-Side
+published: true
+tags:
+- MongoDB
+- NodeJS
+---
+<p>MongoDB 2.1 introduced the <a href="http://docs.mongodb.org/manual/applications/aggregation/">aggregation framework</a>, a faster alternative to Map/Reduce for common aggregation operations. If you took a look at the documentation and examples, you may have found the feature intimidating. Once you tame it, this new feature reveals itself as a very powerful beast. So read on to discover its true power through a series of examples.</p>
+<p><img src="/images/370973576_9c1c871c39_b.jpeg" alt="MongoDB New Aggregation Framework And SQL side-By-Side" /></p>
+<h3><!--more-->A Brief Introduction About The Pipeline Syntax</h3>
+<p>A MongoDB aggregation is a series of special operators applied to a collection. An <em>operator</em> is a JavaScript object with a single property, the operator name, which value is an option object:</p>
+<div class="CodeRay">
+  <div class="code"><pre>{ <span class="predefined">$name</span>: { <span class="comment">/* options */</span> } }</pre></div>
+</div>
+
+<p>Supported operator names are: <code>$project</code>, <code>$match</code>, <code>$limit</code>, <code>$skip</code>, <code>$unwind</code>, <code>$group</code>, and <code>$sort</code>, each with their own set of options. A series of operators is called a <em>pipeline</em>:</p>
+<div class="CodeRay">
+  <div class="code"><pre>[{ <span class="predefined">$project</span>: { <span class="comment">/* options */</span> } }, { <span class="predefined">$match</span>: { <span class="comment">/* options */</span> } }, { <span class="predefined">$group</span>: { <span class="comment">/* options */</span> } }]</pre></div>
+</div>
+
+<p>When executing a pipeline, MongoDB pipes operators into each other. &ldquo;Pipe&rdquo; here takes the Linux meaning: the output of an operator becomes the input of the following operator. The result of each operator is a new collection of documents. So Mongo executes the previous pipeline as follows:</p>
+<div class="CodeRay">
+  <div class="code"><pre>collection | $project | $match | $group =&gt; result</pre></div>
+</div>
+
+<p>You can add as many operators to a pipeline as you like, even twice the same one, at different positions:</p>
+<div class="CodeRay">
+  <div class="code"><pre>collection | $match | $group | $match | $project | $group =&gt; result</pre></div>
+</div>
+
+<p>That explains why a pipeline is not written as a simple JavaScript object, but rather as a collection of objects: in an object, the same operator couldn&rsquo;t appear twice:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">// The first appearance of $match and $group would be ignored with this syntax</span>
+{
+  <span class="predefined">$match</span>:   { <span class="comment">/* options */</span> },
+  <span class="predefined">$group</span>:   { <span class="comment">/* options */</span> },
+  <span class="predefined">$match</span>:   { <span class="comment">/* options */</span> },
+  <span class="predefined">$project</span>: { <span class="comment">/* options */</span> },
+  <span class="predefined">$group</span>:   { <span class="comment">/* options */</span> }
+}
+<span class="comment">// So MongoDB imposes a collection of JavaScript objects instead</span>
+[
+  { <span class="predefined">$match</span>:   { <span class="comment">/* options */</span> } },
+  { <span class="predefined">$group</span>:   { <span class="comment">/* options */</span> } },
+  { <span class="predefined">$match</span>:   { <span class="comment">/* options */</span> } },
+  { <span class="predefined">$project</span>: { <span class="comment">/* options */</span> } },
+  { <span class="predefined">$group</span>:   { <span class="comment">/* options */</span> } }
+]
+<span class="comment">// That's longer and cumbersome to read, but you'll get used to it</span></pre></div>
+</div>
+
+<p>To execute a pipeline on a MongoDB collection, use the <code>aggregate()</code> function on that collection:</p>
+<div class="CodeRay">
+  <div class="code"><pre>db.books.aggregate([{ <span class="predefined">$project</span>: { <span class="key">title</span>: <span class="integer">1</span> } }]);</pre></div>
+</div>
+
+<p><strong>Tip:</strong> If you're using Node.js, both the <a href="https://github.com/mongodb/node-mongodb-native" title="node-mongodb-native package on GitHub">native adapter</a> (since v0.9.9.2) and the <a href="http://mongoosejs.com/" title="Mongoose ODM">ODM</a> (since v3.1.0) support the new aggregation framework. For instance, to execute the previous pipeline on a Mongoose model, you just need to write:</p>
+<div class="CodeRay">
+  <div class="code"><pre>Books.aggregate([{ <span class="predefined">$project</span>: { <span class="key">title</span>: <span class="integer">1</span> } }], <span class="keyword">function</span>(err, results) {
+  <span class="comment">// do something with the result</span>
+});</pre></div>
+</div>
+
+<p>The main benefit of the aggregation framework is that MongoDB executes it without the overhead of the JavaScript engine. It's implemented directly in C++, and therefore it's very fast. The main limitation - as compared to classical SQL aggregation - is that it&rsquo;s limited to a single collection. In other terms, you can&rsquo;t do a Mongo aggregation <em>on several collections</em> using a JOIN-like operation. Apart from that, it&rsquo;s <em>very</em> powerful.</p>
+<p>In this post, I&rsquo;ll illustrate the power of pipeline operators by example, and compare them to their SQL counterpart. For a detailed reference, go to <a href="http://docs.mongodb.org/manual/reference/aggregation/">docs.mongodb.org</a>.</p>
+<h3>Select, alias, compose</h3>
+<p>Use the <code>$project</code> operator to select or rename properties from a collection - similar to what you would do with the SQL SELECT clause.</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">// sample data</span>
+&gt; db.books.find();
+[
+  { <span class="key">_id</span>: <span class="integer">147</span>, <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">War and Peace</span><span class="delimiter">&quot;</span></span>, <span class="key">ISBN</span>: <span class="integer">9780307266934</span> },
+  { <span class="key">_id</span>: <span class="integer">148</span>, <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Anna Karenina</span><span class="delimiter">&quot;</span></span>, <span class="key">ISBN</span>: <span class="integer">9781593080273</span> },
+  { <span class="key">_id</span>: <span class="integer">149</span>, <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Pride and Prejudice</span><span class="delimiter">&quot;</span></span>, <span class="key">ISBN</span>: <span class="integer">9783526419358</span> },
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment"># sample data</span>
+&gt; <span class="class">SELECT</span> * <span class="keyword">FROM</span> book;
++<span class="comment">-----+-----------------------+---------------+</span>
+| id  | title                 | ISBN          |
++<span class="comment">-----+-----------------------+---------------+</span>
+| <span class="integer">147</span> | <span class="string"><span class="delimiter">'</span><span class="content">War and Peace</span><span class="delimiter">'</span></span>       | <span class="integer">9780307266934</span> |
+| <span class="integer">148</span> | <span class="string"><span class="delimiter">'</span><span class="content">Anna Karenina</span><span class="delimiter">'</span></span>       | <span class="integer">9781593080273</span> |
+| <span class="integer">149</span> | <span class="string"><span class="delimiter">'</span><span class="content">Pride and Prejudice</span><span class="delimiter">'</span></span> | <span class="integer">9783526419358</span> |
++<span class="comment">-----+-----------------------+---------------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.books.aggregate([
+  { <span class="predefined">$project</span>: {
+    <span class="key">title</span>: <span class="integer">0</span>,           <span class="comment">// eliminate from the output</span>
+    <span class="key">reference</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$ISBN</span><span class="delimiter">&quot;</span></span>  <span class="comment">// use ISBN as source</span>
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="integer">147</span>, <span class="key">reference</span>: <span class="integer">9780307266934</span> },
+  { <span class="key">_id</span>: <span class="integer">148</span>, <span class="key">reference</span>: <span class="integer">9781593080273</span> },
+  { <span class="key">_id</span>: <span class="integer">149</span>, <span class="key">reference</span>: <span class="integer">9783526419358</span> },
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> id, ISBN <span class="keyword">AS</span> reference <span class="keyword">FROM</span> book;
++<span class="comment">-----+---------------+</span>
+| id  | reference     |
++<span class="comment">-----+---------------+</span>
+| <span class="integer">147</span> | <span class="integer">9780307266934</span> |
+| <span class="integer">148</span> | <span class="integer">9781593080273</span> |
+| <span class="integer">149</span> | <span class="integer">9783526419358</span> |
++<span class="comment">-----+---------------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<p>The <code>$project</code> operator can also create composed fields and sub-documents using any of the supported <a href="http://docs.mongodb.org/manual/reference/aggregation/#aggregation-expression-operators">expression operators</a> (<code>$and, $or, $gt, $lt, $eq, $add, $mod, $substr, $toLower, $toUpper, $dayOfWeek, $hour, $cond, $ifNull</code>, to name a few).</p>
+<h3>Grouping documents</h3>
+<p>Group documents with, as you would have guessed, the <code>$group</code> operator.</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">// fastest way</span>
+&gt; db.books.count();
+<span class="integer">3</span>
+<span class="comment">// if you really want to use aggregation</span>
+&gt; db.books.aggregate([
+  { <span class="predefined">$group</span>: {
+    <span class="comment">// _id is required, so give it a constant value </span>
+    <span class="comment">// to group all the collection into one result</span>
+    <span class="key">_id</span>: <span class="predefined-constant">null</span>,
+    <span class="comment">// increment nbBooks for each document</span>
+    <span class="key">nbBooks</span>: { <span class="predefined">$sum</span>: <span class="integer">1</span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="predefined-constant">null</span>, <span class="key">nbBooks</span>: <span class="integer">3</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> <span class="predefined">COUNT</span>(*) <span class="keyword">FROM</span> book;
++<span class="comment">----------+</span>
+| <span class="predefined">COUNT</span>(*) |
++<span class="comment">----------+</span>
+| <span class="integer">3</span>        |
++<span class="comment">----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">// sample data</span>
+&gt; db.books.find()
+[
+  { <span class="key">_id</span>: <span class="integer">147</span>, <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">War and Peace</span><span class="delimiter">&quot;</span></span>, <span class="key">author_id</span>: <span class="integer">72347</span> },
+  { <span class="key">_id</span>: <span class="integer">148</span>, <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Anna Karenina</span><span class="delimiter">&quot;</span></span>, <span class="key">author_id</span>: <span class="integer">72347</span> },
+  { <span class="key">_id</span>: <span class="integer">149</span>, <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Pride and Prejudice</span><span class="delimiter">&quot;</span></span>, <span class="key">author_id</span>: <span class="integer">42345</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment"># sample data</span>
+&gt; <span class="class">SELECT</span> * <span class="keyword">FROM</span> book
++<span class="comment">-----+---------------------+-----------+</span>
+| id  | title               | author_id |
++<span class="comment">-----+---------------------+-----------+</span>
+| <span class="integer">147</span> | War <span class="keyword">and</span> Peace       | <span class="integer">72347</span>     |
+| <span class="integer">148</span> | Anna Karenina       | <span class="integer">72347</span>     |
+| <span class="integer">149</span> | Pride <span class="keyword">and</span> Prejudice | <span class="integer">42345</span>     |
++<span class="comment">-----+---------------------+-----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.books.aggregate([
+  { <span class="predefined">$group</span>: {
+    <span class="comment">// group by author_id</span>
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$author_id</span><span class="delimiter">&quot;</span></span>,
+    <span class="comment">// increment nbBooks for each document</span>
+    <span class="key">nbBooks</span>: { <span class="predefined">$sum</span>: <span class="integer">1</span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="integer">72347</span>, <span class="key">nbBooks</span>: <span class="integer">2</span> },
+  { <span class="key">_id</span>: <span class="integer">42345</span>, <span class="key">nbBooks</span>: <span class="integer">1</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> author_id, <span class="predefined">COUNT</span>(*)
+  <span class="keyword">FROM</span> book
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> author_id;
++<span class="comment">-----------+----------+</span>
+| author_id | <span class="predefined">COUNT</span>(*) |
++<span class="comment">-----------+----------+</span>
+| <span class="integer">72347</span>     | <span class="integer">2</span>        |
+| <span class="integer">42345</span>     | <span class="integer">1</span>        |
++<span class="comment">-----------+----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<h3>Multi Operator Pipeline</h3>
+<p>A pipeline can feature more than one operator. Here is a combination of <code>$group</code> and <code>$project</code>:</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.books.aggregate([
+  { <span class="predefined">$group</span>: {
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$author_id</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">nbBooks</span>: { <span class="predefined">$sum</span>: <span class="integer">1</span> }
+  } },
+  { <span class="predefined">$project</span>: {
+    <span class="key">_id</span>: <span class="integer">0</span>,
+    <span class="key">authorId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$_id</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">nbBooks</span>: <span class="integer">1</span>
+  } }
+]);
+[
+  { <span class="key">authorId</span>: <span class="integer">72347</span>, <span class="key">nbBooks</span>: <span class="integer">2</span> },
+  { <span class="key">authorId</span>: <span class="integer">42345</span>, <span class="key">nbBooks</span>: <span class="integer">1</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> author_id <span class="keyword">AS</span> author, <span class="predefined">COUNT</span>(*) <span class="keyword">AS</span> nb_books
+  <span class="keyword">FROM</span> book
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> author_id;
++<span class="comment">--------+----------+</span>
+| author | nb_books |
++<span class="comment">--------+----------+</span>
+| <span class="integer">72347</span>  | <span class="integer">2</span>        |
+| <span class="integer">42345</span>  | <span class="integer">1</span>        |
++<span class="comment">--------+----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<h3>More complex aggregations</h3>
+<p><code>$group</code> supports a lot of aggregation functions: <code>$first, $last, $min, $max, $avg, $sum, $push</code>, and <code>$addToSet</code>. Check the <a href="http://docs.mongodb.org/manual/reference/aggregation/#_S_group">MongoDB documentation</a> for a complete reference.</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">// sample data</span>
+&gt; db.reviews.find();
+[
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">455</span><span class="delimiter">&quot;</span></span>, <span class="key">bookId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">974147</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">date</span>: <span class="keyword">new</span> Date(<span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-10</span><span class="delimiter">&quot;</span></span>), <span class="key">score</span>: <span class="integer">1</span> },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">456</span><span class="delimiter">&quot;</span></span>, <span class="key">bookId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">345335</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">date</span>: <span class="keyword">new</span> Date(<span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-12</span><span class="delimiter">&quot;</span></span>), <span class="key">score</span>: <span class="integer">5</span> },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">457</span><span class="delimiter">&quot;</span></span>, <span class="key">bookId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">345335</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">date</span>: <span class="keyword">new</span> Date(<span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-13</span><span class="delimiter">&quot;</span></span>), <span class="key">score</span>: <span class="integer">2</span> },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">458</span><span class="delimiter">&quot;</span></span>, <span class="key">bookId</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">974147</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">date</span>: <span class="keyword">new</span> Date(<span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-16</span><span class="delimiter">&quot;</span></span>), <span class="key">score</span>: <span class="integer">3</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment"># sample data</span>
+&gt; <span class="class">SELECT</span> * <span class="keyword">FROM</span> review;
++<span class="comment">-----+---------+--------------+-------+</span>
+| id  | book_id | <span class="predefined-type">date</span>         | score |
++<span class="comment">-----+---------+--------------+-------+</span>
+| <span class="integer">455</span> | <span class="integer">974147</span>  | <span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-10</span><span class="delimiter">&quot;</span></span> | <span class="integer">1</span>     |
+| <span class="integer">456</span> | <span class="integer">345335</span>  | <span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-12</span><span class="delimiter">&quot;</span></span> | <span class="integer">5</span>     |
+| <span class="integer">457</span> | <span class="integer">345335</span>  | <span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-13</span><span class="delimiter">&quot;</span></span> | <span class="integer">2</span>     |
+| <span class="integer">458</span> | <span class="integer">974147</span>  | <span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-16</span><span class="delimiter">&quot;</span></span> | <span class="integer">3</span>     |
++<span class="comment">-----+---------+--------------+-------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.reviews.aggregate([
+  { <span class="predefined">$group</span>: {
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$bookId</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">avgScore</span>:  { <span class="predefined">$avg</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$score</span><span class="delimiter">&quot;</span></span> },
+    <span class="key">maxScore</span>:  { <span class="predefined">$max</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$score</span><span class="delimiter">&quot;</span></span> },
+    <span class="key">nbReviews</span>: { <span class="predefined">$sum</span>: <span class="integer">1</span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="integer">345335</span>, <span class="key">avgScore</span>: <span class="float">3.5</span>, <span class="key">maxScore</span>: <span class="integer">5</span>, <span class="key">nbReviews</span>: <span class="integer">2</span> },
+  { <span class="key">_id</span>: <span class="integer">974147</span>, <span class="key">avgScore</span>: <span class="integer">3</span>, <span class="key">maxScore</span>: <span class="integer">3</span>, <span class="key">nbReviews</span>: <span class="integer">2</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> book_id,
+         <span class="predefined">AVG</span>(score) <span class="keyword">as</span> avg_score,
+         <span class="predefined">MAX</span>(score) <span class="keyword">as</span> max_score,
+         <span class="predefined">COUNT</span>(*) <span class="keyword">as</span> nb_reviews
+  <span class="keyword">FROM</span> review
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> book_id ;
++<span class="comment">---------+------------+----------+------------+</span>
+| book_id | avg_score | max_score | nb_reviews |
++<span class="comment">---------+------------+----------+------------+</span>
+| <span class="integer">345335</span>  | <span class="float">3.5</span>       | <span class="integer">5</span>         | <span class="integer">2</span>          |
+| <span class="integer">974147</span>  | <span class="integer">2</span>         | <span class="integer">3</span>         | <span class="integer">2</span>          |
++<span class="comment">---------+------------+----------+------------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<h3>Conditions</h3>
+<p>You can restrict the collection to be processed using a <a href="http://www.mongodb.org/display/DOCS/Querying">query object</a>, passed to the <code>$match</code> operator. Whether you place this operator before or after a <code>$group</code> operator, it becomes the equivalent of <code>WHERE</code> or <code>HAVING</code> in SQL.</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.reviews.aggregate([
+  { <span class="predefined">$match</span> : {
+    <span class="key">date</span>: { <span class="predefined">$gte</span>: <span class="keyword">new</span> Date(<span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-11</span><span class="delimiter">&quot;</span></span>) }
+  } },
+  { <span class="predefined">$group</span>: {
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$bookId</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">avgScore</span>: { <span class="predefined">$avg</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$score</span><span class="delimiter">&quot;</span></span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="integer">345335</span>, <span class="key">avgScore</span>: <span class="float">3.5</span> },
+  { <span class="key">_id</span>: <span class="integer">974147</span>, <span class="key">avgScore</span>: <span class="integer">3</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> book_id, <span class="predefined">AVG</span>(score)
+  <span class="keyword">FROM</span> review
+  <span class="keyword">WHERE</span> review.date &gt; <span class="string"><span class="delimiter">&quot;</span><span class="content">2012-07-11</span><span class="delimiter">&quot;</span></span>
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> review.book_id ;
++<span class="comment">---------+------------+</span>
+| book_id | <span class="predefined">AVG</span>(score) |
++<span class="comment">---------+------------+</span>
+| <span class="integer">345335</span>  | <span class="float">3.5</span>        |
+| <span class="integer">974147</span>  | <span class="integer">3</span>          |
++<span class="comment">---------+------------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.reviews.aggregate([
+  { <span class="predefined">$group</span>: {
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$bookId</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">avgScore</span>: { <span class="predefined">$avg</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$score</span><span class="delimiter">&quot;</span></span> }
+  } },
+  { <span class="predefined">$match</span> : {
+    <span class="key">avgScore</span>: { <span class="predefined">$gt</span>: <span class="integer">3</span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="integer">345335</span>, <span class="key">avgScore</span>: <span class="float">3.5</span> }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> book_id, <span class="predefined">AVG</span>(score) <span class="keyword">AS</span> avg_score
+  <span class="keyword">FROM</span> review
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> review.book_id
+  <span class="keyword">HAVING</span> avg_score &gt; <span class="integer">3</span>;
++<span class="comment">---------+------------+</span>
+| book_id | <span class="predefined">AVG</span>(score) |
++<span class="comment">---------+------------+</span>
+| <span class="integer">345335</span>  | <span class="float">3.5</span>        |
++<span class="comment">---------+------------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<h3>Develop Embedded Arrays</h3>
+<p>If documents inside a collection contain arrays, you can develop ("unwind") these arrays into several unique documents using the <code>$unwind</code> operator.</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">// sample data</span>
+&gt; db.articles.find();
+[
+  {
+    <span class="key">_id</span>: <span class="integer">12351254</span>,
+    <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Space Is Getting Closer</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">tags</span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">science</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">space</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">iss</span><span class="delimiter">&quot;</span></span>]
+  },
+  {
+    <span class="key">_id</span>: <span class="integer">22956492</span>,
+    <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Computer Solves Rubiks Cube</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">tags</span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">computing</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">science</span><span class="delimiter">&quot;</span></span>]
+  }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment"># sample data</span>
+&gt; <span class="class">SELECT</span> * <span class="keyword">FROM</span> article;
++<span class="comment">------------+---------------------------+</span>
+| id       | title                       |
++<span class="comment">----------+-----------------------------+</span>
+| <span class="integer">12351254</span> | Space <span class="keyword">Is</span> Getting Closer     |
+| <span class="integer">22956492</span> | Computer Solves Rubiks Cube |
++<span class="comment">------------+---------------------------+</span>
+&gt; <span class="class">SELECT</span> * <span class="keyword">FROM</span> tag;
++<span class="comment">-----+------------+-----------+</span>
+| id  | article_id | name      |
++<span class="comment">-----+------------+-----------+</span>
+| <span class="integer">534</span> | <span class="integer">12351254</span>   | science   |
+| <span class="integer">535</span> | <span class="integer">12351254</span>   | space     |
+| <span class="integer">536</span> | <span class="integer">12351254</span>   | iss       |
+| <span class="integer">816</span> | <span class="integer">22956492</span>   | computing |
+| <span class="integer">817</span> | <span class="integer">22956492</span>   | science   |
++<span class="comment">-----+------------+-----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.articles.aggregate([
+  { <span class="predefined">$unwind</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$tags</span><span class="delimiter">&quot;</span></span> }
+]);
+[
+  {
+    <span class="key">_id</span>: <span class="integer">12351254</span>,
+    <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Space Is Getting Closer</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">tags</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">science</span><span class="delimiter">&quot;</span></span>
+  },
+  {
+    <span class="key">_id</span>: <span class="integer">12351254</span>,
+    <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Space Is Getting Closer</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">tags</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">space</span><span class="delimiter">&quot;</span></span>
+  },
+  {
+    <span class="key">_id</span>: <span class="integer">22956492</span>,
+    <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Computer Solves Rubiks Cube</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">tags</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">computing</span><span class="delimiter">&quot;</span></span>
+  },
+  {
+    <span class="key">_id</span>: <span class="integer">22956492</span>,
+    <span class="key">title</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Computer Solves Rubiks Cube</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">tags</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">science</span><span class="delimiter">&quot;</span></span>
+  }
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> article.id, article.title, tag.name
+  <span class="keyword">FROM</span> article <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> tag
+  <span class="keyword">ON</span> article.id = tag.article_id;
++<span class="comment">------------+-----------------------------+-----------+</span>
+| article.id | article.title               | tag.name  |
++<span class="comment">------------+-----------------------------+-----------+</span>
+| <span class="integer">12351254</span>   | Space <span class="keyword">Is</span> Getting Closer     | science   |
+| <span class="integer">12351254</span>   | Space <span class="keyword">Is</span> Getting Closer     | space     |
+| <span class="integer">22956492</span>   | Computer Solves Rubiks Cube | computing |
+| <span class="integer">22956492</span>   | Computer Solves Rubiks Cube | science   |
++<span class="comment">------------+-----------------------------+-----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<h3>Aggregate Developed Arrays</h3>
+<p>The true power of the aggregation framework reveals when you pipe <code>$unwind</code> to <code>$group</code>. This is similar to using <code>LEFT JOIN ... GROUP BY</code> in SQL.</p>
+<table width="100%" style="border: none;">
+
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.articles.aggregate([
+  { <span class="predefined">$unwind</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$tags</span><span class="delimiter">&quot;</span></span> },
+  { <span class="predefined">$group</span>: {
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$tags</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">nbArticles</span>: { <span class="predefined">$sum</span>: <span class="integer">1</span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">science</span><span class="delimiter">&quot;</span></span>, <span class="key">nbArticles</span>: <span class="integer">2</span> },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">space</span><span class="delimiter">&quot;</span></span>, <span class="key">nbArticles</span>: <span class="integer">1</span> },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">computing</span><span class="delimiter">&quot;</span></span>, <span class="key">nbArticles</span>: <span class="integer">1</span> },
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> tag.name, <span class="predefined">COUNT</span>(article.id) <span class="keyword">AS</span> nb_articles
+  <span class="keyword">FROM</span> article <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> tag
+  <span class="keyword">ON</span> article.id = tag.article_id
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> tag.name;
++<span class="comment">-----------+-------------+</span>
+| tqg.name  | nb_articles |
++<span class="comment">-----------+-------------+</span>
+| science   | <span class="integer">2</span>           |
+| space     | <span class="integer">1</span>           |
+| computing | <span class="integer">1</span>           |
++<span class="comment">-------------+-----------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+<tr>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; db.articles.aggregate([
+  { <span class="predefined">$unwind</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$tags</span><span class="delimiter">&quot;</span></span> },
+  { <span class="predefined">$group</span>: {
+    <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$tags</span><span class="delimiter">&quot;</span></span>,
+    <span class="key">articles</span>: { <span class="predefined">$addToSet</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">$_id</span><span class="delimiter">&quot;</span></span> }
+  } }
+]);
+[
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">science</span><span class="delimiter">&quot;</span></span>, <span class="key">articles</span>: [<span class="integer">12351254</span>, <span class="integer">22956492</span>] },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">space</span><span class="delimiter">&quot;</span></span>, <span class="key">articles</span>: [<span class="integer">12351254</span>] },
+  { <span class="key">_id</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">computing</span><span class="delimiter">&quot;</span></span>, <span class="key">articles</span>: [<span class="integer">22956492</span>] },
+]</pre></div>
+</div>
+
+</td>
+<td valign="top" width="50%">
+<div class="CodeRay">
+  <div class="code"><pre>&gt; <span class="class">SELECT</span> tag.name, GROUP_CONCAT(article.id) <span class="keyword">AS</span> articles
+  <span class="keyword">FROM</span> article <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> tag
+  <span class="keyword">ON</span> article.id = tag.article_id
+  <span class="keyword">GROUP</span> <span class="keyword">BY</span> tag.name;
++<span class="comment">-----------+-------------------+</span>
+| tqg.name  | articles          |
++<span class="comment">-----------+-------------------+</span>
+| science   | <span class="integer">12351254</span>,<span class="integer">22956492</span> |
+| space     | <span class="integer">12351254</span>          |
+| computing | <span class="integer">22956492</span>          |
++<span class="comment">-------------+-----------------+</span></pre></div>
+</div>
+
+</td>
+</tr>
+
+</table>
+<h3>Conclusion</h3>
+<p>Imagine what you can do with this system... Pipe operators one after the other, group, sort, limit, etc. The ultimate example, taken from <a href="http://docs.mongodb.org/manual/tutorial/aggregation-examples/#average-city-population-by-state">the MongoDB documentation itself</a>, shows a pipeline with two successive <code>$group</code> operators. An SQL database can only do that with subqueries.</p>
+<p>If your Map/Reduce functions are simple enough, refactor your Mongo code to the new aggregation framework. It will execute faster, and open to a new realm of possibility.</p>

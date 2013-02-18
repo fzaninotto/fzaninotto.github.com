@@ -1,0 +1,27 @@
+---
+layout: post
+title: Uptime 1.3 is released
+published: true
+tags:
+- NodeJS
+- open source
+- uptime
+---
+<p><a href="https://github.com/fzaninotto/uptime">Uptime</a>, the remote monitoring application that you can run on your own servers, continues to evolve. Version 1.3 sees the introduction of monthly reports for tags, a feature made to ease reports to your end users.<img src="/images/2012-08-06_0935.png" alt="Uptime 1.3 is released" /></p>
+<p>In addition to bugfixes and internal refactorings, this version adds polish to the user interface. Here is the complete changelog:<!--more--></p>
+<ul>
+<li>Added a User-Agent header to both http and https pollers, to identify pings from the monitor in server logs; you can override * the header via configuration</li>
+<li>Fixed "Save and add" redirection</li>
+<li>Made check title optional (falls back to the url)</li>
+<li>Fixed handling of relative Location headers</li>
+<li>Fixed chart timezone and vertical scale bugs</li>
+<li>Made new events more apparent in the navbar, and in the events page</li>
+<li>Removed custom date display logic and added moment.js as a dependency.</li>
+<li>Fixed check when http redirects to https</li>
+<li>Removed lifecycleEventsPlugin and added mongoose-lifecycle module as a dependency. This change renames events on Mongoose * models from 'pre-' to 'before-' and from 'post-' to 'after-' (e.g. 'postRemove' becomes 'afterRemove').</li>
+<li>Modified API routes to be more RESTful</li>
+<li>Upgraded dependencies (mongoose, express, ejs, config, async, socket.io)</li>
+<li>Added a Reports tab for tags, offering easily accessible monthly reports</li>
+<li>Made tabs compatible with direct links and back button in tag and check view</li>
+</ul>
+<p>Uptime is still for Node.js 0.6.x only. A version compatible with Node 0.8 will be in the works as soon as the two main dependencies of the project, <a href="http://expressjs.com/">Express</a> and <a href="https://github.com/LearnBoost/mongoose">Mongoose</a>, hit the "stable" status on Node 0.8.</p>

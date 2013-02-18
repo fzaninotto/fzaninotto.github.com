@@ -1,0 +1,18 @@
+---
+layout: post
+title: "Faker For ORM: Now with Behavior Support"
+published: true
+tags:
+- faker
+---
+<p>Faker, the PHP fake data generator, already knows how to populate a database using an ORM. As <a href="http://dotheweb.posterous.com/using-faker-to-populate-a-database-its-easier">explained in an earlier post</a>, the metadata provided to the ORM is often sufficient to qualify the formatter required for each column. So for instance, to populate 3 records in an <code>author</code> table with <code>first_name</code>, <code>last_name</code>, <code>date_of_birth</code>, and <code>email</code> columns, using the Propel ORM all it takes is the following code:</p>
+<p><script src="https://gist.github.com/2c4d087346149b86055e.js"></script></p>
+<p>The <code>\Faker\ORM\Propel\Populator</code> class guesses the formatters to use for each column based on their name and/or column type.</p>
+<p>However, if you look carefully at the generated data, it's not consistent. <!--more-->Because the email is generated independently of the name, it doesn't seem to relate to the same person. In order to generate consistent data, you should be able to modify the email fake data yourself.</p>
+<p>That's why Faker allows you to specify <strong>custom column formatters</strong> using the third parameter of the <code>addEntity</code> call:</p>
+<p><script src="https://gist.github.com/23da8bc6e7c5f689182c.js"></script></p>
+<p>But what if you need to access the object itself during generation, instead of a single column? For instance, the <code>Author</code> model can use the <code>sortable</code> behavior to keep the authors in order of preference. In order to generate a consistent (and properly ordered) set of authors, each new <code>Author</code> object must be inserted at a random position in the list. This is made possible thanks to the <strong>custom modifiers</strong> parameter, the fourth of the <code>addEntity()</code> parameter:</p>
+<p><script src="https://gist.github.com/ce33b05065d20708ba61.js"></script></p>
+<p>Just as it knows which formatters to use based on column metadata, Faker also guesses the custom formatters to apply to an entity populator based on the behaviors used by the entity. That means that, since the <code>Author</code> model uses the Propel <code>sortable</code> behavior, the custom modifier is not even necessary: Faker will generate fake <code>Author</code> instances with consistent sorting on its own:</p>
+<p><script src="https://gist.github.com/082c11799362c861d1a3.js"></script></p>
+<p>Faker currently implements custom modifiers for the <code>sortable</code>, and <code>nested_set</code> behaviors. Besides, the <code>timestampable</code> and <code>sluggable</code> behaviors need no specific modifier and work out of the box within Faker.</p>

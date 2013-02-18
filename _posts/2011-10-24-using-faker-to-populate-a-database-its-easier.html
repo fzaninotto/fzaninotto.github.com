@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Using Faker to Populate a Database: With an ORM, It's a Piece of Cake"
+published: true
+tags:
+- development
+- php
+---
+<p>Generating test data for your database requires imagination. Too much imagination in fact, if you want to populate tables with thousands of records with relatively good relevance.</p>
+<p>Fortunately, <a href="https://github.com/fzaninotto/Faker" title="Faker on GitHub">Faker</a>&nbsp;can do the job for you. For instance, to populate an <code>author</code> table with 100 test authors, here is how to make Faker and PDO cooperate for the best:<!--more--></p>
+<p><script src="https://gist.github.com/1308547.js"></script></p>
+<p>If you use an ORM like <a href="http://www.propelorm.org/" title="The PRopel website">Propel</a>, you can get rid of the PDO machinery to deal with Entity objects:</p>
+<p><script src="https://gist.github.com/1308553.js"></script></p>
+<p>You may notice that the names of the Faker formatters are very similar to that of the author properties. In fact, it's quite easy to choose a Faker formatter based on a column name - or type. And that's exactly what The <code>Faker\ORM\Propel\Populator</code> does: based on the metadata gathered from model introspection, it infers the best formatters to use for each column. The code to populate 100 authors is then much shorter:</p>
+<p><script src="https://gist.github.com/1308655.js"></script></p>
+<p>This is so easy that you can populate an entire database in no time. For instance, if an <code>Author</code> has many <code>Books</code>, and a <code>Book</code> has many <code>Reviews</code>, here is how to bootstrap an application for stress test:</p>
+<p><script src="https://gist.github.com/1308697.js"></script></p>
+<p>This snippet will add tons of data to the three tables. And since the Populator collects the inserted primary keys along the process, it can reinject them as random foreign keys on related objects. In this example, the populated <code>Books</code> get related to one of the populated <code>Authors</code>, and the populated <code>Reviews</code> get related to one of the populated <code>Books</code>. That's why the calling order of the <code>addEntity()</code> method is important - the entities generated first become available for relationship to the entities generated next. The result is that the generated data looks like real data, including the relationships between entities.</p>
+<p>The Faker Populator allows the developer to override the formatter used for a particular property. For instance, the <code>Book</code> Entity has an <code>ISBN</code> property declared as a string of 13 characters. Faker's guesser would generate a random string looking like 'gudgtsncrdkfu' for this property - which clearly doesn't look like a real ISBN. It's very easy to pass a closure in the third argument to the <code>addEntity()</code> method call, so that the populator use a custom formatter for this property:</p>
+<p><script src="https://gist.github.com/1308714.js"></script></p>
+<p>When populating the <code>ISBN</code> property of each new <code>Book</code> entity, the populator now calls the anonymous function instead of the default <code>text</code> formatter. It passes the already inserted PKs and the current entity as arguments (even if the anonymous function shown above ignores them) to ease the crafting of fake data related to other entities or to the current one.</p>
+<p>The Propel Populator for Faker is a simple and powerful tool that will let you work in development with close-to-real data volumes. When the time to put applications to production comes, there should be no bad surprise due to longer queries or bad indexes - these can now be detected earlier in development.</p>

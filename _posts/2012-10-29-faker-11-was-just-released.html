@@ -1,0 +1,28 @@
+---
+layout: post
+title: Faker 1.1 was just released
+published: true
+tags:
+- faker
+- php
+---
+<p><a href="https://github.com/fzaninotto/Faker">Faker</a>, the random data generator for PHP, has recently received some press coverage thanks to a simple tweet from <a href="http://www.smashingmagazine.com/">Smashing Magazine</a>. This brought a lot of traffic and attention to the library, and it became urgent to release a new version. So here it is: version 1.1 packs all bugfixes and enhancements since the original 1.0 release 4 months ago.</p>
+<p>Here is the changelog:</p>
+<p>
+<ul>
+<li>Updated text provider to return paragraphs as a string instead of array. Great for populating markdown textarea fields (Seldaek)</li>
+<li>Updated dateTimeBetween to accept DateTime instances (Seldaek)</li>
+<li>Added random number generator between a and b, simply like rand() (Seldaek)</li>
+<li>Fixed spaces in generated emails (blaugueux)</li>
+<li>Fixed Person provider in Russian locale (Isamashii)</li>
+<li>Added new UserAgent provider (blaugueux)</li>
+<li>Added locale generator to Miscellaneous provider (blaugueux)</li>
+<li>Added timezone generator to DateTime provider (blaugueux)</li>
+<li>Added new generators to French Address providers (departments, regions) (geoffrey-brier)</li>
+<li>Added new generators to French Company provider (catch phrase, SIREN, and SIRET numbers) (geoffrey-brier)</li>
+<li>Added state generator to German Address provider (Powerhamster)</li>
+<li>Added Slovak provider (bazo)</li>
+<li>Added latitude and longitude formatters to Address provider (fixe)</li>
+<li>Added Serbian provider (umpirsky)</li>
+</ul>
+Thanks a lot to all the contributors!</p>

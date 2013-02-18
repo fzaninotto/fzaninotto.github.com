@@ -1,0 +1,45 @@
+---
+layout: post
+title: This is not what you think. Beware of "this"... in JavaScript
+published: true
+tags:
+- JavaScript
+---
+<p>JavaScript on the server side is a wonderful tool for simple asynchronous jobs that take the most of the server you run. But if you come from a PHP background, you may quickly have strange bugs when writing object-oriented code in JavaScript.</p>
+<p>Here is a simple script:</p>
+<div class="CodeRay">
+  <div class="code"><pre>var A = function() {
+  this.value = 'hello';
+};
+
+A.prototype.getValue = function() {
+  return this.value;
+}
+
+var B = function() {}
+
+B.prototype.doStuff = function(callback) {
+  return callback();
+}
+
+var a = new A();
+console.log(a.getValue()); // hello world
+
+var b = new B();
+console.log(b.doStuff(a.getValue)); // undefined</pre></div>
+</div>
+
+<p>What? <code>b.doStuff()</code> takes a cllback as an argument and simply calls it, so the last line should return just the same string as the first call ('hello world').</p>
+<p>It turns out the <code>this</code> keyword in the <code>getValue</code> function doesn't carry the same object in the two cases. That's right: in JavaScript, <code>this</code> called from inside an object method yields a different result depending on how you call the method.</p>
+<p>You will find all the details in these enlightening posts:</p>
+<ul>
+<li><a href="http://javascriptweblog.wordpress.com/2010/08/30/understanding-javascripts-this/">http://javascriptweblog.wordpress.com/2010/08/30/understanding-javascripts-this/</a></li>
+<li><a href="http://devlicio.us/blogs/sergio_pereira/archive/2009/02/09/javascript-5-ways-to-call-a-function.aspx">http://devlicio.us/blogs/sergio_pereira/archive/2009/02/09/javascript-5-ways-to-call-a-function.aspx</a></li>
+</ul>
+<p>Bottomline: each time you pass a callback as an argument to another function, if this callback makes use of the <code>this</code> keyword, uou must bind the callback to the object you want <code>this</code> to refer to:</p>
+<div class="CodeRay">
+  <div class="code"><pre>var b = new B();
+console.log(b.doStuff(a.getValue.bind(a))); // hello world</pre></div>
+</div>
+
+<p>I musn't be the first to fall into that pit, so hopefully this oddity of JavaScript won't surprise you too much.</p>

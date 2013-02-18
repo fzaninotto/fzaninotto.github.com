@@ -1,0 +1,18 @@
+---
+layout: post
+title: Enable Back Button Handling With Twitter Bootstrap Tabs Plugin
+published: true
+tags:
+- JavaScript
+---
+<p><a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> offers a <a href="http://twitter.github.com/bootstrap/javascript.html#tabs">neat plugin called Tabs</a>, to add "quick, dynamic tab and pill functionality for transitioning through local content". The problem is that this plugin doesn't support back button navigation. In other terms, if you switch tabs and then go to another page, a click on the back button of your browser brings you back to the first open tab, not the last open one.</p>
+<p>Yuck.</p>
+<p>Unfortunately, the author of the plugin <a href="https://github.com/twitter/bootstrap/pull/581#issuecomment-2657772">doesn't want to support this</a>, as it's impossible to implement in a cross-browser way.</p>
+<p>But if you don't mind leaving behind all the IE7 users and go the HTML5 way - for instance for a backend interface with limited access - then it's pretty easy to implement. <!--more-->Thanks to the new <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/history.html">HTML5 history API</a>, you can manipulate the browser history to fit your needs. Implementing back button navigation to a Twitter Bootstrap tab then becomes easy:</p>
+<p><script src="https://gist.github.com/b67783284c5eaa21815c.js"></script></p>
+<p>It took me a while to figure out how to implement this feature for <a href="https://github.com/fzaninotto/uptime">Uptime</a>, the remote monitoring tool written in Node.js, so I hope someone will find this useful.</p>
+<p>For more information about this new HTML5 API, I recommend these two links:</p>
+<ul>
+<li><a href="http://diveintohtml5.info/history.html">Manipulating History For Fun&amp;Profit</a> on "Dive into HTML5"</li>
+<li><a href="https://developer.mozilla.org/en/DOM/window.history">Window.history object reference</a> on MDN</li>
+</ul>

@@ -1,0 +1,91 @@
+---
+layout: post
+title: "Node.js for PHP programmers #2: Modules, Packages, And The Strawberry House"
+published: true
+tags:
+- development
+- JavaScript
+- NodeJS
+- php
+---
+<p>PHP knows how to group classes under a common namespace, and to create redistributable packages using PEAR. Node.js is also very good at organizing code into modular and reusable sets, but there are key differences. I'll explain them shortly, but before I'd like to talk about dolls.<img src="/images/Strawberry-Shortcake-Playset-Berry-Cafe.jpg" alt="Node.js for PHP programmers #2: Modules, Packages, And The Strawberry House" /></p>
+<h3>The Doll Problem</h3>
+<p>My 4-year old daughter was recently offered a second-hand doll set, including 4 dolls, various clothes, furniture, a pony, and a strawberry house. She loves to dress and undress the dolls, and I'm glad to see her learning how to do that perfectly - much better than she knows how to dress herself.<!--more--></p>
+<p>The problem is that she doesn't know how to put the clothes away when she finishes playing, just like she leaves her scarf, sweater and cap on the floor when she comes back home. So it's my sad duty to put the doll clothes away in the strawberry house, and this is a pain. You see, each piece of clothing must be neatly folded and put away in a very specific place, otherwise "it's not good". So the pink socks must go into the bedroom closet in the strawberry house, but not the pink dress - no, this one must go into the entrance chest.</p>
+<p>If you want my opinion, folding and putting doll clothes away is so boring that this task should be given to a computer. My daughter would probably never understand it, but I'm sure you will.</p>
+<h3>Including Scripts in PHP and Node.js</h3>
+<p>PHP knows how to categorize classes using namespaces. Here is an example:</p>
+<p><script src="https://gist.github.com/529f2f01cdaadd23b236.js"></script></p>
+<p>PHP namespaces are a very simple feature. At compile time, the PHP parser prefixes all the class names in the file using the declared namespace. So <code>Sock</code> (the class name) becomes <code>House\Bedroom\Closet\Sock</code> (the fully qualified class name) - it's just string manipulation. It's enough to prevent name collision, but it often makes the code harder to read than it really should:</p>
+<p><script src="https://gist.github.com/7b7bcdb1e3717b344f05.js"></script></p>
+<p>The Node.js equivalent of the <code>Sock</code> class declarations is straightforward. In JavaScript, classes are functions, and methods are properties of the function object's prototype. This may be disturbing at first, but you will quickly get used to it.</p>
+<p><script src="https://gist.github.com/15977fbd2c03800bbe16.js"></script></p>
+<p>The last line is more specific to Node.js. Node provides a global object called <code>exports</code>. The script adds the newly defined <code>Sock</code> class as a property of this <code>exports</code> object. In practice, this last line "exports" the class to the outside, and defines the public API of the script.</p>
+<p>To import this <code>exports</code> object into another variable, Node provides the <code>require()</code> function:</p>
+<p><script src="https://gist.github.com/acb11d268aa54f038f2e.js"></script></p>
+<p>Although the code looks similar to the PHP version, what happens here is a little different. Node's <code>require()</code> function does not just load and execute the <code>socks.js</code> code directly. Instead, it returns a copy of the <code>exports</code> object defined in the <code>socks.js</code> script.</p>
+<p>Tip: Node doesn't need the <code>.js</code> ending in the file path passed as parameter to <code>require()</code>. Node finds the script even if you just call <code>require('./house/bedroom/closet/sock')</code>. The suffix will be omitted in further examples.</p>
+<h3><code>require</code> Is The Gate To The Module System</h3>
+<p>To be fair, <code>exports</code> is not really a global object. It's local to a Node <em>module</em>. And what's a module? In short, it's a closure. Here is what the call to <code>require</code> actually does behind the curtain:</p>
+<p><script src="https://gist.github.com/6128b216541b56bb68dd.js"></script></p>
+<p><code>require</code> encapsulates the <code>sock.js</code> code into a closure, and executes it using the <code>exports</code> object as a parameter. That's why <code>exports</code> is said to be a <em>pseudoglobal</em>: it is seen as a global variable from within a module, but in fact it is local to this module. So all the variables defined in a module (like <code>accepted_colors</code> and <code>Sock</code>) are isolated and don't pollute the global namespace. Only the properties added to the <code>exports</code> parameter make it to the outside:</p>
+<p><script src="https://gist.github.com/a5732259154a1355a908.js"></script></p>
+<p>The <code>accepted_colors</code> variable is therefore private and cannot be accessed by any outside script that <code>require</code>s the sock module. You can imagine how this can be used to create <em>private classes</em>, a concept nowhere to be found in PHP.</p>
+<p>Node.js isn't at the origin of the module concept. It's part of an initiative called <a href="http://www.commonjs.org/">CommonJS</a>, and the <a href="http://www.commonjs.org/specs/modules/1.0/">CommonJS "module" feature</a> has several implementations. Node.js offers one of them, adds some syntactic sugar and a few bonus features.</p>
+<h3>Modules Are Smart Objects</h3>
+<p>There is one major difference between the PHP and the JavaScript versions of the doll socks example. In JavaScript, <code>sock</code> is just the name of the variable storing the <code>require()</code> return value. This "namespace" is nowhere to be found in the original <code>sock.js</code> script. In other terms, in JavaScript it's the caller who adds the namespace, while in PHP the callee must be namespaced.</p>
+<p>That makes aliasing trivial in Node:</p>
+<p><script src="https://gist.github.com/384c1de77cda24cc8244.js"></script></p>
+<p>This is the equivalent of the <code>use ... as</code> statement in PHP:</p>
+<p><script src="https://gist.github.com/41524ef101edbb72452f.js"></script></p>
+<p>By the way, if a module exports just a single class, you may want to use an alternative exporting method called <code>module.exports</code>:</p>
+<p><script src="https://gist.github.com/674976a3e49276f694a2.js"></script></p>
+<p>Where does that <code>module</code> object come from? Just like <code>exports</code>, it is passed to the module as a pseudoglobal. To be completely fair, the result of a call to <code>require('sock')</code> looks more like the following:</p>
+<p><script src="https://gist.github.com/7a1cee782e4efef3b058.js"></script></p>
+<p>Yes, that's an anonymous function calling itself. For an average PHP developer, this may be looking like voodoo, but the truth is to be found farther East.</p>
+<h3>Node's Modules Are Matryoshka Dolls</h3>
+<p>You know these Russian nesting dolls called <a href="http://en.wikipedia.org/wiki/Matryoshka_doll">Matryoshka dolls</a>? Well, Node modules are a bit like that. Small modules can nest inside larger modules:</p>
+<p><script src="https://gist.github.com/7b8580023fcfe9c9bbfc.js"></script></p>
+<p>You can require a module and reexport it. And since the <code>require()</code> function is in fact a pseudoglobal, it executes in the context (and using the file path) of the current module. That makes nesting of modules extremely easy, without necessarily using long fully qualified class names as in PHP. Besides, it keeps the code readable, while PHP code following the <a href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0 standard</a> is harder to read due to namespaces matching the directory structure.</p>
+<p>There is much more to tell about Node's module system. But doll clothes need to be put away. <a href="http://nodejs.org/docs/latest/api/modules.html">Node.js module documentation</a> is a must read if you really need to know more.</p>
+<h3>The Doll House</h3>
+<p>Once every cloth is neatly folded at the right place, the strawberry doll house can be closed. It has a nice handle, so I could easily give the strawberry house to another kid to freak their dad out. The same goes for libraries: you can <em>package</em> several scripts together, and distribute the result across your company, or the Internet.</p>
+<p>PHP's doll house market is called <a href="http://pear.php.net/">PEAR</a>. It should be the default distribution method used by library developers, but it's more and more replaced by <code>git clone</code> or <a href="https://github.com/composer/composer">composer</a>. That's probably because PEAR has many drawbacks. First, it installs libraries user- (or system-) wide, which means that all projects must share the same version of a given library. Second, creating PEAR packages is a pain due to a very verbose XML package description format. Third, publishing packages is not an easy task (having your own package registered on the main PEAR channel is heavy, and hosting your own channel is heavy, too). Last, many PEAR packages have not been updated for a while - that's not the preferred package registry anymore.</p>
+<p>Node, on the other hand, comes with a very powerful <a href="http://npmjs.org/">Node Package Manager</a>. <code>npm</code> is both a distribution utility and the central repository for Node public packages. Check the list of available packages (about 7000 packages available as of writing this post) in the <a href="http://search.npmjs.org/">node registry</a>.</p>
+<p>If you want to publish your own package for other developers using npm, you don't need anybody's permission, you don't even need to describe all the files in your package. You just need a simple <code>package.json</code> at the root of the package looking like the following:</p>
+<p><script src="https://gist.github.com/acb12e2614530f4bb045.js"></script></p>
+<p>The npm <a href="http://npmjs.org/doc/json.html">JSON package description format</a> allows for much more metadata, but these four lines are enough to publish the package to the node public registry. To do so, just call:</p>
+<div class="CodeRay">
+  <div class="code"><pre>npm publish .</pre></div>
+</div>
+
+<p>Of course, you can also choose to publish a package only to <a href="http://npmjs.org/doc/registry.html">your own private registry</a>.</p>
+<p>To install a public node package, just call <code>npm install</code>:</p>
+<div class="CodeRay">
+  <div class="code"><pre>npm install my-little-pony</pre></div>
+</div>
+
+<p>This downloads and installs the <code>my-little-pony</code> package, together with all its dependencies, under the <code>node_modules/</code> subdirectory, under the current path.</p>
+<p>Even better, if you define your own list of dependencies in the <code>package.json</code> file, npm will download and install all of them for you when you call:</p>
+<div class="CodeRay">
+  <div class="code"><pre>npm install</pre></div>
+</div>
+
+<h3>Multiple Modules and Package versions</h3>
+<p>The greatest thing about both the module and package system of Node.js is that it solves version conflicts in the most elegant way: by allowing several versions of a module or package in the same application.</p>
+<p>Let's say you use the <code>strawberry-house</code> package AND the <code>girl-toys</code> packages in a project. <code>girl-toys</code> itselfs depends on the <code>strawberry-house</code> package, and there are chances that it doesn't require the same version than the one you're using directly.</p>
+<p>It doesn't matter: npm will install the <code>girl-toys</code> dependencies in its own directory, and let you use your own version:</p>
+<div class="CodeRay">
+  <div class="code"><pre>app.js                   // your own app
+node_modules/
+  strawberry-house/      // the one you use directly
+  girl-toys/
+    node_modules/
+      strawberry-house/  // the one used by girl-toys
+      my-little-pony/</pre></div>
+</div>
+
+<p>With Node's encapsulated module system, you'll never have to worry about version conflicts anymore.</p>
+<h3>Conclusion</h3>
+<p>I learned how to fold doll clothes, I'm sure you'll learn how to use Node's powerful module system. Both are easy, and programmers tend to have more fun with the latter. As compared to the equivalent features in PHP, Node modules and packages feel very refreshing. That's probably why the Node community is so active, and the number of available packages is growing so rapidly.</p>
+<p>Also in this series: <a href="http://dotheweb.posterous.com/nodejs-for-php-programmers-1-event-driven-pro">Node.js for PHP programmers #1: Event-driven Programming... and Pasta</a>&nbsp;and&nbsp;<a href="http://dotheweb.posterous.com/nodejs-for-php-programmers-3-exceptions-and-e">Node.js for #PHP Programmers #3: Exceptions and Errors</a>.</p>
