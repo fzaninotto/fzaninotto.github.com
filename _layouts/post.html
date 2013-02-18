@@ -5,7 +5,7 @@ layout: default
 <div id="post">
 {{ content }}
 <p style="text-align: right">
-    <a href="https://twitter.com/share" class="twitter-share-button" data-via="francoisz">Tweet</a>
+    <a href="https://twitter.com/share" class="twitter-share-button" data-text="{{ page.title }} - Redo The Web" data-via="francoisz">Tweet</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
     Published on {{ page.date | date_to_string }}
     {% if page.tags != empty %}
