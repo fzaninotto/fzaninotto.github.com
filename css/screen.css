@@ -75,6 +75,13 @@ ul.posts {
     font-size: 80%;
   }
 
+  .postImage {
+    width: 200px;
+    display: block;
+    float: right;
+    margin: 0 0 15px 15px;
+  }
+
 #home p {
   margin-bottom: 0;
 }
@@ -152,7 +159,6 @@ header .subtitle {
   }
 
   .site .rest {
-    text-align: right;
     margin: 0.2em 0 2em;
   }
 
