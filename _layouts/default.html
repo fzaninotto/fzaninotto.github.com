@@ -5,6 +5,11 @@
    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
    <title>{{ page.title }}</title>
    <meta name="author" content="François Zaninotto" />
+   <meta name="twitter:card" content="summary">
+   <meta name="twitter:url" content="{{ page.url }}">
+   <meta name="twitter:title" content="{{ page.title }}">
+   <meta name="twitter:description" content="{{ page.excerpt | strip_html | truncate:200 }}">
+   <meta name="twitter:image" content="{{ page.image }}">
    <link href="http://feeds.feedburner.com/redotheweb_" rel="alternate" title="Redo The Web" type="application/atom+xml" />
 
    <!-- syntax highlighting CSS -->
