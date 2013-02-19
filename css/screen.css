@@ -17,8 +17,7 @@ html, body {
 
 body {
   background-color: white;
-  font: 13.34px helvetica, arial, clean, sans-serif;
-  *font-size: small;
+  font-family: helvetica, arial, clean, sans-serif;
   text-align: center;
 }
 
@@ -102,7 +101,7 @@ header {
   border-right: solid 1px #000;
   bottom: 0;
   left: 0;
-  padding: 2em 20px 0 20px;
+  padding: 1.5em 1em 0 1em;
   position: fixed;
   overflow: hidden;
   top: 0;
@@ -126,10 +125,9 @@ header .subtitle {
 }
 
 .site {
-  font-size: 110%;
   text-align: justify;
   width: 42em;
-  margin: 3em auto 2em 240px;
+  margin: 3em auto 2em 230px;
   line-height: 1.5em;
 }
 
@@ -204,6 +202,7 @@ footer a {
     border: 1px solid #ddd;
     background-color: #eef;
     padding: 0 .4em;
+    overflow: auto;
   }
 
   #post ul,
