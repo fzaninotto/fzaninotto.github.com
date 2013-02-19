@@ -6,7 +6,7 @@ excerpt: How can developers safely rely on third-party web services without sacr
 image: /images/Twitter_API_Status.png
 ---
 <p>How can developers safely rely on third-party web services without sacrificing their own SLA? Once you start using an API, you must monitor it. Unfortunately, there is no standard way of doing so. Perhaps it's time to ask SaaS providers to be transparent about their health status.</p>
-<p><img src="/images/Twitter_API_Status.png" alt="Head Up: What If API Status Pages Were Standardized?" /></p>
+<p><img src="/images/Twitter_API_Status.png" alt="Head Up: What If API Status Pages Were Standardized?" width="100%" /></p>
 <h3>The problem</h3>
 <p>Web applications use more and more third-party web services. In production, they are used for analytics, log storage, A/B testing, comments, search, emailing, media, queuing, etc. In development, it's for version control, automated build, backup, authentication, you name it. Using third-party web services accelerates development, but it also weakens applications. Indeed, an outage in one of the services may cause an outage of the whole application.</p>
 <p>Developers must implement failure scenarios for when third-party services fail. But they must also monitor these services to be notified whenever one breaks. And this is where the problem begins: each service provider offers a different way to determine its API status - if any.<!--more--></p>
