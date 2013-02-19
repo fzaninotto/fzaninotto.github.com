@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us" prefix="og: http://ogp.me/ns#">
 <head>
    <link href='http://fonts.googleapis.com/css?family=Cabin+Condensed:700' rel='stylesheet' type='text/css'>
    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
    <title>{{ page.title }}</title>
    <meta name="author" content="François Zaninotto" />
-   <meta name="twitter:card" content="summary">
-   <meta name="twitter:url" content="{{ page.url }}">
-   <meta name="twitter:title" content="{{ page.title }}">
-   <meta name="twitter:description" content="{{ page.excerpt | strip_html | truncate:200 }}">
-   <meta name="twitter:image" content="{{ page.image }}">
+   <meta name="twitter:card" content="summary" />
+   <meta name:"twitter:site" content="@francoisz" />
+   <meta name:"twitter:creator" content="@francoisz" />
+   <meta property="og:url" content="{{ page.url }}" />
+   <meta property="og:title" content="{{ page.title }}" />
+   <meta property="og:description" content="{{ page.excerpt | strip_html | truncate:200 }}" />
+   <meta property="og:image" content="{{ page.image }}" />
    <link href="http://feeds.feedburner.com/redotheweb_" rel="alternate" title="Redo The Web" type="application/atom+xml" />
 
    <!-- syntax highlighting CSS -->
