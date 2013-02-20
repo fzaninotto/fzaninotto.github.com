@@ -53,6 +53,12 @@ table {
   font: 100%;
 }
 
+blockquote {
+  padding: 0 0 0 15px;
+  margin: 0 0 20px;
+  border-left: 5px solid #eeeeee;
+}
+
 /*****************************************************************************/
 /*
 /* Home
@@ -201,8 +207,8 @@ footer a {
   #post pre {
     border: 1px solid #ddd;
     background-color: #eef;
-    padding: 0 .4em;
     overflow: auto;
+    padding: 0.5em;
   }
 
   #post ul,
@@ -213,14 +219,18 @@ footer a {
   #post code {
     border: 1px solid #ddd;
     background-color: #eef;
-    font-size: 85%;
-    padding: 0 .2em;
   }
 
     #post pre code {
       border: none;
+      line-height: normal;
+      margin: 0;
     }
 
+.site .highlight {
+  line-height: 1em;
+  margin-bottom: 1em;
+}
   /* terminal */
 
   #post pre.terminal {
