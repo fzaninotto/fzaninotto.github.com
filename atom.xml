@@ -5,22 +5,26 @@ layout: nil
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>François Zaninotto</title>
- <link href="http://tom.preston-werner.com/atom.xml" rel="self"/>
- <link href="http://tom.preston-werner.com/"/>
+ <link href="http://redotheweb.com/atom.xml" rel="self"/>
+ <link href="http://redotheweb.com/"/>
  <updated>{{ site.time | date_to_xmlschema }}</updated>
- <id>http://tom.preston-werner.com/</id>
+ <id>http://redotheweb.com/</id>
  <author>
-   <name>Tom Preston-Werner</name>
-   <email>tom@mojombo.com</email>
+   <name>François Zaninotto</name>
  </author>
 
  {% for post in site.posts %}
  <entry>
    <title>{{ post.title }}</title>
-   <link href="http://tom.preston-werner.com{{ post.url }}"/>
+   <link href="http://redotheweb.com{{ post.url }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
-   <id>http://tom.preston-werner.com{{ post.id }}</id>
-   <content type="html">{{ post.content | xml_escape }}</content>
+   <id>http://redotheweb.com{{ post.id }}</id>
+   <content type="html">
+    {% if post.image != null %}
+    <img src="http://redotheweb.com{{ post.image }}" width="200" align="right" />
+    {% endif %}
+    {{ post.content | xml_escape }}
+   </content>
  </entry>
  {% endfor %}
 
