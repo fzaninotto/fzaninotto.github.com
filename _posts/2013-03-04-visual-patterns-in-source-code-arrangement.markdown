@@ -9,7 +9,7 @@ Source code arrangement is a matter of debate. What would you consider a good pr
 
 ## The Mistletoe
 
-One very large file (greater than 500 lines of code) among a tree structure of normal size files. This files doesn't look at its place, I call it the **mistletoe**. Whether it's a CSS or a list of utility methods, dealing with large files is often a developer's nightmare. It's a good start for a refactoring session: split the mistletoe into several files, it will disappear.
+One very large file (greater than 500 lines of code) among a tree structure of normal size files. This file looks out of place, I call it the **mistletoe**. Whether it's a CSS or a list of utility methods, dealing with large files is often a developer's nightmare. It's a good start for a refactoring session: split the mistletoe into several files, it will disappear.
 
 ![The Mistletoe](/images/codeflower/mistletoe.png)
 
