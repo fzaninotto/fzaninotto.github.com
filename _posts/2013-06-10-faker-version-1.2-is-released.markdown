@@ -15,7 +15,7 @@ More than 7 months after the previous release, I have the great pleasure to intr
 
 Faker uses [composer](https://packagist.org/packages/fzaninotto/faker), so all you have to do is to change the version requirement in your `composer.json`, as follows:
 
-{% gist 3117dabe32e25f319d3a %}
+<script src="https://gist.github.com/fzaninotto/3117dabe32e25f319d3a.js"></script>
 
 ## New locales
 
