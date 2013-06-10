@@ -121,7 +121,7 @@ header {
   line-height: 1.5em;
 }
 
-header a, header a:visited {
+header h1 a, header h1 a:visited {
   color: white;
   font-weight: bold;
   text-decoration: none;
@@ -133,6 +133,14 @@ header .subtitle {
   font-size: 1em;
   margin: 0;
   line-height: 1.2em;
+}
+
+header .subtitle a, header .subtitle a:visited {
+  color: #aaa;
+}
+
+header .subtitle a:hover {
+  text-decoration: none;
 }
 
 .site {
