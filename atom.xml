@@ -20,10 +20,9 @@ layout: nil
    <updated>{{ post.date | date_to_xmlschema }}</updated>
    <id>http://redotheweb.com{{ post.id }}</id>
    <content type="html">
-    {% if post.image != null %}
-    <img src="http://redotheweb.com{{ post.image }}" width="200" align="right" />
-    {% endif %}
+    <![CDATA[
     {{ post.content | xml_escape }}
+    ]]>
    </content>
  </entry>
  {% endfor %}
