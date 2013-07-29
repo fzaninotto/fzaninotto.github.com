@@ -19,6 +19,7 @@ layout: nil
    <link href="http://redotheweb.com{{ post.url }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
    <id>http://redotheweb.com{{ post.id }}</id>
+   <summary>{{ post.excerpt | strip_html | xml_escape }}</summary>
    <content type="html">
     <![CDATA[
     {{ post.content | xml_escape }}
