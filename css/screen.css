@@ -48,6 +48,9 @@ p {
   p {
     font-size: 14px;
   }
+  .gist, pre, code {
+    font-size: 12px;
+  }
 }
 
 a {
