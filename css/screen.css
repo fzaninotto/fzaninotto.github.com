@@ -278,10 +278,6 @@ ul.posts span.date {
   margin: 0;
 }
 
-.highlight {
-line-height: 1em;
-}
-
 /* terminal */
 
 #post pre.terminal {
