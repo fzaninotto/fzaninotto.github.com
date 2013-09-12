@@ -9,35 +9,35 @@ tags:
 - php
 ---
 <p>Just like PHP, JavaScript supports Exceptions - only they're called Errors. However, due to the asynchronous nature of Node.js, the classic try/catch strategy doesn't work. To catch asynchronous errors, Node strongly encourages a particular signature for callback functions. I'll explain all that shortly, but now I have a confession to make.<img src="/images/Digest3.png" alt="Node.js for PHP Programmers #3: Exceptions and Errors" /></p>
-<h3>Sometimes Things Go Wrong</h3>
+<h2>Sometimes Things Go Wrong</h2>
 <p>I don't eat meat. It's not because I like animals too much - I don't believe chickens have a soul. <!--more-->It's just that I ate a lot of meat previously in my life, and if every person on this planet eats as much meat as I did, the place will become awful to live in. If you don't believe me, go watch <a href="http://www.youtube.com/view_play_list?p=6A1FD147A45EF50D">this video on YouTube</a> and thank Prof. Albert Bartlett for the depression. So I quit eating flesh a year ago, and so far my teeth haven't fallen or something.</p>
 <p>But to be honest, I still eat meat every once in a while. You see, vegetarians have to take pills to compensate for the nutriments they don't get from the meat. I prefer to eat meat than pills. And since the Sunday meal is often a family moment, and since meat MUST be on the menu, I eat meat almost every Sunday.</p>
 <p>And I like meat. That means that I love the Sunday meals, whether it's veal saut&eacute; with white wine, or roasted chicken with French fries. And last time I ate too much of it. Then things started going wrong.</p>
-<h3>The PHP Digestive System</h3>
+<h2>The PHP Digestive System</h2>
 <p>I won't expose in details the miserable Sunday afternoon I spent after that. However, since the audience of this blog is mostly composed of programmers, I can write what happened in PHP.</p>
 <p><script src="https://gist.github.com/d828c29738889e93f543.js"></script></p>
-<h3>The Node.js Digestive System</h3>
+<h2>The Node.js Digestive System</h2>
 <p>JavaScript is another good way to express my misery. And since <a href="http://dotheweb.posterous.com/nodejs-for-php-programmers-1-event-driven-pro">Node.js puts a dose of asynchronicity on top of JavaScript</a>, it's a good opportunity to show that digestion can take time. Here is the equivalent of the previous class, written for Node.js:</p>
 <p><script src="https://gist.github.com/79905c66b00d5098a113.js"></script></p>
 <p>In <code>digest()</code>, <code>setTimeout()</code> is there to simulate an asynchronous processing. Asynchronous functions don't use the <code>return</code> statement to return their result. Instead, they call the given callback with the result as parameter. That's why <code>digest()</code> ends with <code>callback(nutriments)</code> instead of <code>return $nutriments</code> as in PHP. Therefore, <code>eat()</code> has to provide a callback when calling <code>digest()</code>. When all the elements are processed, <code>eat()</code> can return <code>true</code> by calling its own callback.</p>
 <p><strong>Tip</strong>: If you don't understand why the line <code>var body = this</code> is necessary, you've not yet encountered the First Gotcha of JavaScript. Head to <a href="http://dotheweb.posterous.com/this-is-not-what-you-think-beware-of-this-in">my article on "this"</a> for more details.</p>
 <p><strong>Second Tip</strong>: The test <code>if (processedElements == meal.length)</code> is a way to determine when the asynchronous meal digestion is complete. The need to resynchronize asynchronous processing arises quite often in Node.js, and instead of using boilerplate code similar to this one, you should definitely use the <a href="https://github.com/caolan/async"><code>async</code> module</a>. It offers resynchronization, and many other things. In my opinion, it should be part of the Node.js core.</p>
-<h3>Wait, It Doesn't Work</h3>
+<h2>Wait, It Doesn't Work</h2>
 <p>The <code>digest()</code> function is asynchronous, remember? So when Node executes this piece of code from <code>eat()</code>:</p>
 <p><script src="https://gist.github.com/d14d6626b97669cb887b.js"></script></p>
 <p>Node iterates over every element in the meal, executes <code>HumanBody.digest()</code> on all of them, then ends. That means that if a problem of digestive capacity occurs while in <code>digest()</code>, it will be <em>after</em> the end of the <code>eat()</code> execution, and that means after the <code>try {} catch {}</code> statement is finished. The <code>Error</code> will never get caught, and this is dramatic. Imagine a human body unable to vomit even when filled up over the limit? Explosion!</p>
-<h3>No try/catch in Node.js</h3>
+<h2>No try/catch in Node.js</h2>
 <p>In asynchronous programming, the communication channel between the caller function and the callee is the callback. The only solution to overcome the uncaught error is to pass the <code>Error</code> to the callback. So the <code>eat()</code> and <code>digest()</code> functions must be refactored as follows:</p>
 <p><script src="https://gist.github.com/7dbaae6b583e059a2077.js"></script></p>
 <p>The important thing is is the new signature of the callback passed to <code>digest()</code>:</p>
 <p><script src="https://gist.github.com/935f480aa916e8927a1c.js"></script></p>
 <p>The callback expects that an error may be passed by the asynchronous digestion. And it's the responsibility of the callback to deal with this error <em>if it exists</em>, and to proceed with normal operations otherwise.</p>
 <p>And it's the only way to catch an error thrown in an asynchronous function. So forget about <code>try {} catch {}</code> in Node.js. You will use them very seldom, while callbacks expecting errors are everywhere.</p>
-<h3>Always Carry Your Errors With You</h3>
+<h2>Always Carry Your Errors With You</h2>
 <p>What happens with the asynchronous digestion can happen in every asynchronous function in Node.js. Thats's why the core asynchronous functions always show <code>err</code> as the <strong>first</strong> argument of every callback. If the operation was completed successfully, then the first argument will be <code>null</code> or <code>undefined</code>. Here is an example with the equivalent of PHP's <code>realpath()</code>:</p>
 <p><script src="https://gist.github.com/583db3b6bd2672526c94.js"></script></p>
 <p>When you design your own asynchronous functions, follow this rule of thumb and always put the error as first argument of the callback. It's also a good way to remember that you have to deal with the error cases first.</p>
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>There is still a flaw in the Node.js <code>HumanBody</code> implementation. If something bad happens in the middle of the meal digestion, the vomiting is triggered and the main callback is called with <code>false</code> as argument. But the <code>forEach()</code> loop continues. That means that the callback may be called a second time with <code>true</code> as argument. The correction is left as an exercise for the reader.</p>
 <p>As for my digestive problems, they're over. But "Once bitten, twice shy", so I always think that something bad may happen to me when eating meat, and I'm very careful.</p>
 <p>If you don't want to give up meat, you should be careful, too. Always expect that something bad may happen, and you will design robust and effective programs - even in asynchronous Node.js.</p>

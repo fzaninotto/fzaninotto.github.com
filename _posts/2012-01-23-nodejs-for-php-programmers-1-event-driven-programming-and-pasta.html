@@ -10,14 +10,14 @@ tags:
 ---
 <p>For a PHP developer, asynchronicity is the most puzzling aspect of the <a href="http://nodejs.org/">Node.js</a> runtime. It's simply a new way to write programs. And once you pass the first learning steps, event-driven programming opens a world of possibilities PHP programmers would never dream of.&nbsp;I'll try to explain you how it works, but first, let's talk about pasta.</p>
 <p><img src="/images/spaghetti_with_tomato_sauce.jpg" alt="Node.js for PHP Programmers #1: Event-driven programming... and Pasta." /></p>
-<h3>A Simple Pasta Recipe</h3>
+<h2>A Simple Pasta Recipe</h2>
 <p>I love good pasta. But it's very easy to cook bad pasta, so I have a motto: Do Not Eat Pasta Cooked by People You Don't Trust. Since you're a person I trust, I'll give you a simple recipe that you can't screw up, so that when we meet in real life, we can eat together.</p>
 <p>The recipe is spaghetti with fresh tomato sauce.<!--more--> Put a large quantity of water in a pan, together with a pinch of salt - it will take approximately 10 minutes to boil. In the meantime, peel a bunch of fresh tomatoes and chop them roughly. Also peel and mince an onion, a carrot, some garlic, and a stalk of celery. This mix is called a <a href="http://en.wikipedia.org/wiki/Mirepoix_%28cuisine%29">mirepoix</a>, or, as the Italians say, a soffritto. At that time, the water should be boiling, so you can put the spaghetti in the pan. While it boils, put some olive oil in a second pan and heat the mirepoix for a few minutes. Then add the tomatoes, some herbs, salt and pepper, and stirr. You should heat the tomatoes for five minutes at most, because after that they create a certain acidity that only disappears after an hour of heating. Taste the spaghetti regularly to be sure to take it out of the water when it's cooked <em>al dente</em>. Drain it, serve in a warm plate with the sauce, add some basil cut in a chiffonade, and some parmiggiano cheese. Voil&agrave;.</p>
-<h3>Synchronous Programming</h3>
+<h2>Synchronous Programming</h2>
 <p>If you're not starving after reading this, you can probably follow the next exercise: how would you ask a computer to cook my spaghetti with fresh tomato sauce? In PHP, that would look like the following:</p>
 <p><script src="https://gist.github.com/7d144b2afa9a8a5b8594.js"></script></p>
 <p>There is a big problem with this program: the whole recipe takes 29 minutes, and the spaghetti arrives in the plate already cold, because it waits for more than ten minutes until the sauce is ready. Cold spaghetti is an offense, you should avoid it by all means. When I cook this spaghetti, I boil the water at the same time as I chop the vegetables. Read again the recipe: it contains indications such as "in the meantime", "while it boils", and "taste regularly". The PHP program doesn't do that, no wonder the spaghetti it produces is inedible.</p>
-<h3>Asynchronous Programming</h3>
+<h2>Asynchronous Programming</h2>
 <p>Let's teach PHP to cook properly. For this purpose, the best design pattern is <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-driven programming</a>. The program now relies on a central&nbsp;<code>EventLoop</code> class, which represents a service that loops, incrementing an internal tick at each loop. Other services can add callbacks to be executed at a given tick. When all added callbacks are executed, the loop stops.</p>
 <p><script src="https://gist.github.com/5f17abd3a50a35cf9194.js"></script></p>
 <p>Taking advantage of this event loop, a new kind of service class can be created: asynchronous services. For instance, the asynchronous pan:</p>
@@ -40,7 +40,7 @@ Tick is 10
 Now it's cooked</pre></div>
 </div>
 
-<h3>Asynchronous Cooking</h3>
+<h2>Asynchronous Cooking</h2>
 <p>Now everything is ready for another spaghetti sauce. This time, can the sauce and the spaghetti be ready at the same time? Since the spaghetti takes 18 minutes and the sauce 11 minutes, the program should wait about 7 minutes to start cooking the sauce.</p>
 <p><script src="https://gist.github.com/3af09df037a161c9ab08.js"></script></p>
 <p>Ask PHP to execute the program, and asynchronicity starts to shine:</p>
@@ -71,18 +71,18 @@ saucePan: Tomato sauce is ready</pre></div>
 
 <p>Awesomesauce! Everything is ready at the same time after a short 18 minutes.</p>
 <p>One side note: When you compare the first script and the last one, you immediately recognize a visual difference. In the first script, all lines of code align vertically; if you want to understand what happens sequentially, you just need to read from top to bottom. In the last script, on the other hand, it's indentation that means that statements get executed one after the other. In order to follow the course of the program, you must read from left to right. In event-driven programming, indentation means sequence.</p>
-<h3>When Asynchronous Callbacks Must Synchronize</h3>
+<h2>When Asynchronous Callbacks Must Synchronize</h2>
 <p>There is just one problem. The plate gets served at the end of the script because the event loop runs out of callbacks. But what if the script had to schedule more callbacks for later execution, like washing the dishes for instance? The plate would be served very late, with cold spaghetti. That's something you should never, ever do. It is sacrilege.</p>
 <p>So the script must not rely on the end of the event loop. That means no code should appear after the <code>$eventLoop-&gt;start()</code> line. But how to synchronize the fact that the plate gets the contents of both pans, since they run in separate sequences?</p>
 <p>You could wait until the tick is 18 and then serve the plate, but that would be betting on chance. Although the asynchronous services of this example are based on timing, this is seldom the case. Most asynchronous callbacks are triggered by the return of a third-party service, like a database query, the opening of a file on disk, or the response from an HTTP request. You never really know when this is going to happen. So you have to rely on new techniques for resynchronization.</p>
 <p>On the case of the spaghetti with tomato sauce, it's quite easy:</p>
 <p><script src="https://gist.github.com/c0286d6e876dcaeda613.js"></script></p>
 <p>The plate needs to know what it expects, and check whether it is complete each time it receives the contents of a pan. The example doesn't really matter, but you must remember that <em>you</em> are in charge of synchronization in event-driven programming, not the runtime.</p>
-<h3>There Is Still Only One Cook</h3>
+<h2>There Is Still Only One Cook</h2>
 <p>The first script takes 29 minutes to cook bad pasta, the second one takes only 18 minutes for simple yet delicious pasta. And yet, there is still only one cook - or, in programming terms, one execution thread. You could spawn a new thread to cook faster, but they are things that can't be accelerated: If you use a flamethrower to warm up the tomato, it won't be ready sooner: it will be burned.</p>
 <p>Let me rephrase this: This is not parallel programming. The code executed in the last script executes sequentially, however the event loop gives the illusion that code gets executed by "someone else". Also, this last script packs more actions in a shorter time. Seen from a CPU, that means less cycles wasted waiting for blocking operations, and more cycles actually spent computing. Event-driven programming allows you to use more of your CPU.</p>
 <p>In sequential computing, the wasted CPU cycles by a given thread are salvaged by other, parallel threads. That's why, when using PHP with Apache and mod_php, you define the number of concurrent server processes. The trouble is, each time you spawn a new thread to recuperate wasted CPU cycles by another thread, it consumes a lot of memory. Conclusion: to use the CPU as efficiently as an event-driven program, a sequential program needs a lot more memory. And memory is the most expensive part of web servers.</p>
-<h3>What About Node.js?</h3>
+<h2>What About Node.js?</h2>
 <p>How does Node.js compare to PHP? The same way the first script compares to the last one. Node.js promotes event driven programming, and facilitates it. First, it relies on JavaSript, which provides an advanced event system. Second, Node provides an EventLoop object, and starts it for you at the end of the main script. Last, Node provides new (native) implementations for most blocking I/O operations that takes advantage of asynchronicity.</p>
 <p>For example, to delete a file on the disk using Node, the code looks like this:</p>
 <p><script src="https://gist.github.com/1cba044fa932e25c7af0.js"></script></p>
@@ -93,7 +93,7 @@ saucePan: Tomato sauce is ready</pre></div>
 <p><script src="https://gist.github.com/649bbfc1a9409c9bd37a.js"></script></p>
 <p>Lastly, Node allows to write dynamic servers, while PHP needs a server on its own (like Apache) to handle the raw HTTP request. That means that a Node server stays in memory and is compiled only once. Compared to mod_php, which loads the entire PHP runtime and all the required scripts for every single HTTP request, that's a big boost.</p>
 <p><strong>Note</strong>: One important JavaScript gotcha PHP programmers should be aware of is the evil nature of the <code>this</code> keyword. I already mentioned it in <a href="http://dotheweb.posterous.com/this-is-not-what-you-think-beware-of-this-in">a previous post</a>.</p>
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>Overall, Node.js is faster than PHP, and consumes less memory. However, Node programming becomes increasingly difficult as the server codebase increases, because you then need to synchronize manually. That makes Node suitable for small to medium size servers doing simple operations - REST APIs, for instance, are a good fit.</p>
 <p>To me, Node's true value, besides the event loop, is the new asynchronous implementation of database queries, file operations, HTTP queries, etc. This is pure gold, especially when you realize that other implementations basically waste your CPU cycles.</p>
 <p>Now that you're aware of the most distinctive feature of Node, I hope you're convinced to give it a try. I also hope you're convinced that cooking your own pasta is easy and that you will try my open-source recipe.</p>

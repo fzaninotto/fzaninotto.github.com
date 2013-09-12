@@ -8,28 +8,28 @@ tags:
 ---
 <p><a href="https://github.com/fzaninotto/uptime">Uptime</a>, your own website monitoring application built using Node.js, has gone through a major refactoring during the past months. So many things have changed that it&rsquo;s like getting a new, premium version. Before it gets released, you have the opportunity to test the future Uptime V3 and help to find remaining bugs. Read on to see what&rsquo;s new.</p>
 <p><img src="/images/check_list.png" alt="Uptime V3 Is On The Way: Join The Beta!" /></p>
-<h3><!--more-->Uptime Bars</h3>
+<h2><!--more-->Uptime Bars</h2>
 <p>The dashboards used to give too much text data. With several dozen checks, it was almost impossible to detect outages or abnormal behavior in a list of checks or tags.</p>
 <p>The solution? Remove text content, and add smart data visualization. And the best graphical visualization for site monitoring is uptime bars: a green rectangle showing outages as red intervals. That's what uptime now uses, and you won't ever miss a 5 minutes outage again.</p>
-<h3>Exact Availability Calculation</h3>
+<h2>Exact Availability Calculation</h2>
 <p>The calculation of check availability was wrong. Uptime used to divide the number of "up" pings by the total number of pings over a period of time to get an average availability. But if the periodicity of pings changed during this period, the calculation was wrong. If the check was paused during this period, the calculation was wrong.</p>
 <p>Similarly, the calculation of availability in tags used to be wrong, too. Uptime used to calculate an average of the availability of all the checks of a tag, while a tag should be considered down when at least one of its check is down.<img src="/images/tag_details.png" alt="Uptime V3 Is On The Way: Join The Beta!" /></p>
 <p>Based on the same algorithm as the one used for uptime bars, the new availability calculation uses outage periods and not individual pings. So now it&rsquo;s exact, both for checks and tags. Be aware: you might realize that a group of websites provide a slightly worse Quality of Service than what Uptime 1.0 reported. But now it&rsquo;s the true score.</p>
-<h3>New Stats Page and date navigation</h3>
+<h2>New Stats Page and date navigation</h2>
 <p>The check details page used to provide too much details and not enough data synthesis. While it was possible to see the average response time <em>evolution</em> between two boundaries, it was challenging to get the average response time <em>score</em> between the same boundaries.</p>
 <p>The new stats page focuses on a few simple indicators before digging into the details. Also, the date navigation has been completely rebuilt to provide more intuitive controls, and the support of browser history.<img src="/images/check_details.png" alt="Uptime V3 Is On The Way: Join The Beta!" /></p>
 <p>Lastly, the new Stats page leverages the most advanced Twitter Bootstrap layouts, so that you can get both a great screen experience and a printable report without reload.</p>
-<h3>No More License Problem</h3>
+<h2>No More License Problem</h2>
 <p>One of the strong points of Uptime has always been its uptime charts - powered by HighCharts. The problem was that HighChart is a commercial product, and that obliged the companies interested by Uptime (which is free) for a commercial use to buy a license from HighCharts.</p>
 <p>Uptime V3 now uses <a href="http://www.humblesoftware.com/flotr2/">Flotr2</a> to draw its charts. The new charts are simpler and more readable, yet they still look gorgeous. And Flotr2 is published under the MIT License, which makes Uptime a completely free software.</p>
-<h3>Many, Many Tweaks</h3>
+<h2>Many, Many Tweaks</h2>
 <p>Uptime V3 has been heavily tweaked to improve the user experience. There are lots of little details you may not notice at first - that means that the GUI doesn&rsquo;t get on the way between you and your data. These tweaks help to show just the information you need, just when you need it, and hide what you don&rsquo;t need to let you interact with your data seamlessly. Uptime now behaves more like a desktop application, and it&rsquo;s still blazingly fast (thanks to Node.js, jQuery and MongoDB).</p>
 <p><img src="/images/tag_list.png" alt="Uptime V3 Is On The Way: Join The Beta!" /></p>
-<h3>How Can You Help?</h3>
+<h2>How Can You Help?</h2>
 <p>The new Uptime is in beta for now. I need feedback for various usage patterns to polish the rough edges and detect the remaining bugs. You can help by installing the beta and adding new checks - import of existing checks from a previous version is not yet fully implemented. Uptime even comes with fake data, if you just want to spend a few minutes to play with the new user experience.</p>
 <p>Here is how you can get it running:</p>
 <p><script src="https://gist.github.com/04b852602a8c40c18427.js"></script></p>
 <p>Then go to <a href="http://localhost:8082/">http://localhost:8082/</a>, click everywhere, find the bugs, and report them in the project&rsquo;s <a href="https://github.com/fzaninotto/uptime/issues">GitHub Issues</a>.</p>
-<h3>Uptime V3? Where is Uptime V2?</h3>
+<h2>Uptime V3? Where is Uptime V2?</h2>
 <p>In <a href="http://dotheweb.posterous.com/uptime-is-now-node-08-compatible">a previous post</a>, I announced the upcoming release of Uptime V2, which had the exact same features as Uptime V1, but was compatible with Node 0.8. This version 2 is what you currently get by cloning the master repository. It won&rsquo;t receive any evolution in the future.</p>
 <p>The new release is therefore a Version 3. If this feels like almost jumping one version number, it&rsquo;s voluntary. Uptime V3 is really a major step forward, packing more features without any sacrifice on usability. Powerful, fast and easy: you&rsquo;ll love it.</p>

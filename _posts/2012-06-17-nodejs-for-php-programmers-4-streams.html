@@ -11,11 +11,11 @@ tags:
 <p>After dealing with web applications a lot, you realize that it's all about a series of bytes transiting from one computer to another. You can accomplish tremendous things without ever understanding how this flow works. But when you want to go <em>really fast</em>, when you want to unlock the ultimate power hidden deep inside your server, then you have to speak like the computers do.</p>
 <p><a href="http://www.flickr.com/photos/zero101/4088241352/"><img class="posterous_download_image" src="http://farm3.staticflickr.com/2542/4088241352_e9d578d2b2_b.jpg" border="0" width="500" /></a></p>
 <p>Which brings me to streams. This feature is greatly overlooked in PHP, and ubiquitous in Node. I'll explain how Node streams differ from PHP I/O manipulations, but first, I have a confession to make.<!--more--></p>
-<h3>I'm Not a Geek</h3>
+<h2>I'm Not a Geek</h2>
 <p>Just because I always felt at ease with computers, my friends always took me for some kind of geek. Okay I can use the <code>OFFSET()</code> function in Excel to amaze the accountants, but that doesn't make me comparable to cosplayers or government database hackers. But it doesn't make any difference for my friends, and so they always ask me for help when they struggle with computers.</p>
 <p>About ten years ago, a couple of friends went for a year in New-Zealand. Before leaving, they asked me if I could setup a photo blog for them to communicate with their friends (it was before Flickr and Picasa and Facebook and Instagram ever existed). So I downloaded an open-source photo album application (written in PHP by the way) and uploaded it to a server I was renting for my own. They made <em>a lot</em> of pictures, published them regularly, and we were all very jealous. Then they came back, and we all forgot about the photo blog.</p>
 <p>A few days ago, the same couple of friends reminded me of the photo blog, and they wanted to get the pictures back. Or rather, as we're now living in a different era, they asked me if I could transfer the pictures to Flickr. Why did they think I could do that? Do they really think I'm a geek?</p>
-<h3>Wasting Time</h3>
+<h2>Wasting Time</h2>
 <p>After thinking about it, the transfer doesn't sound too hard to do. I only need to upload a PHP script to the server that can browse the filesystem and make a POST http request to the Flickr API. How hard could that be?</p>
 <p><script src="https://gist.github.com/91d5d368fcf73faebdfe.js"></script></p>
 <p>You may wonder: why use <code>fsockopen()</code> instead of <a href="http://guzzlephp.org/index.html">Guzzle</a>, <a href="https://github.com/kriswallsmith/Buzz">Buzz</a>, or even <a href="http://framework.zend.com/manual/en/zend.http.client.html#zend.http.client.usage">Zend<em>Http</em>Client</a>? Because they don't change the result of this script: it's too slow. There are tons of images in the directory, and the execution never ends.</p>
@@ -23,7 +23,7 @@ tags:
 <p><script src="https://gist.github.com/7327f0c782ae987170c2.js"></script></p>
 <p>The PHP process wastes a lot of time waiting. Even if you have a very fast CPU, file and network I/O make the script too slow to be really usable on a large number of files.</p>
 <p><em>Tip</em>: Of course, Flickr has an authentication system which grants a token that should be added to each API call. But it's been removed from the current example to keep your attention focused.</p>
-<h3>Streams To The Rescue</h3>
+<h2>Streams To The Rescue</h2>
 <p>To exchange data between systems, the script uses <em>files</em> and <em>requests</em>, but these concepts are too high level to be truly efficient in heavy usage scenarios. There is another reality, at a lower level. It might me daunting at first, but once you've discovered it, you can never come back. Come on, take the red pill, and let me introduce you to <em>streams</em>.</p>
 <p><img src="/images/matrix.jpg" alt="Node.js For PHP Programmers #4: Streams" /></p>
 <p>A stream represents a flow of bytes between two containers. In the previous PHP script, the data flows first from the disk to memory (<code>file_get_contents()</code>), then from the memory to the distant server (<code>fwrite()</code>). Wouldn't it be more efficient to start flowing bytes from the memory to the distant server before the initial disk flow is finished? Using streams, it's possible: a script can send an image to Flicker <em>while</em> it reads this image from the filesystem.</p>
@@ -31,7 +31,7 @@ tags:
 <p><script src="https://gist.github.com/e9f31df0e7e0764c41fd.js"></script></p>
 <p>File reads are now less blocking: PHP only waits for chunks of 1024 bytes to be read from the disk to sent them over HTTP. Consequently, this second upload script is a bit faster than the first one.</p>
 <p>But dealing with streams in PHP is painful. The API is purely functional, not object-oriented. There are tons of functions with <a href="http://www.php.net/manual/en/function.stream-filter-register.php">opaque names</a>, several ways to do a simple operation, and very <a href="http://www.php.net/manual/en/function.stream-bucket-make-writeable.php">defective pieces of documentation</a>. There must be a better way to do this.</p>
-<h3>Code-switching</h3>
+<h2>Code-switching</h2>
 <p>Node.js comes with a native asynchronous <a href="http://nodejs.org/api/stream.html">stream API</a>. In fact, most I/O operations in Node result in a stream by default. HTTP requests are network I/O, file reads are disk I/O, so Node naturally treats both as streams.</p>
 <p>This means that streaming data from one source to another is really a breeze. The following script is the equivalent of the previous PHP script using Node.js:</p>
 <p><script src="https://gist.github.com/25bd6f592f44db7edb7b.js"></script></p>
@@ -40,14 +40,14 @@ tags:
 <p><script src="https://gist.github.com/4de4fadd6f59ea5f921e.js"></script></p>
 <p><em>Tip</em>: Node uses a <a href="http://en.wikipedia.org/wiki/Chunked_transfer_encoding">chunked transfer encoding</a> by default on HTTP requests, so there is no need to specify the 'Content-Length' header.</p>
 <p>The Node.js version is faster to execute, but it is not really faster to read and write than the PHP version. Let's find an even better tool for the job.</p>
-<h3>There Is An NPM Package For That</h3>
+<h2>There Is An NPM Package For That</h2>
 <p>HTTP client requests with Node can be somewhat verbose. I recommend the use of  <a href="https://github.com/mikeal/request">request</a>, a npm package facilitating HTTP requests. This package is so generic that chances are that you may use it in all your Node projects.</p>
 <p>With the <code>request</code> package, the code to initialize a POST request is simply <code>request.post(url)</code>, so the Flickr upload script reduces to:</p>
 <p><script src="https://gist.github.com/f5e0a71b54c2329d5b50.js"></script></p>
 <p>If you take out console messages and temporary variables, the code becomes extremely concise:</p>
 <p><script src="https://gist.github.com/25fa2094d6cddbce3c6b.js"></script></p>
 <p>Compare that to the first PHP script. Stunning, isn't it?</p>
-<h3>The Need For Speed</h3>
+<h2>The Need For Speed</h2>
 <p>Instead of reading one file after the other, why not use the power of Node to do that asynchronously? This kind of asynchronous iteration requires a meeting point to make sure all the operation are closed. You could try redeveloping this logic from scratch, but someone already did it better (as often with Node.js), in an npm package called <a href="https://github.com/caolan/async">async</a>. <code>async.forEach(array, iterator)</code> applies an iterator function to each item in an array, in parallel. Here is the Flickr upload script with parallel file reads:</p>
 <p><script src="https://gist.github.com/2945620.js"></script></p>
 <p>But is this script really faster? The answer is yes and no. It is faster because you don't need to wait for the end of a file transfer to start the next. It is not faster because asking a disk to read from several files at the same time can more expensive than reading one file sequentially (unless you have a RAID 10 array, a NAS, or a SSD, your hard drive has a single <a href="http://en.wikipedia.org/wiki/Disk_read-and-write_head">read/write head</a>. The boost of the parallel HTTP stream probably outweights the slowdown of the parallel disk reads. But the real problem is that if the script opens a lot of simultaneous HTTP connections to Flickr, and Flickr will probably kick you out for that. So this is a bad enhancement.</p>

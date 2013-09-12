@@ -8,7 +8,7 @@ tags:
 ---
 <p>MongoDB 2.1 introduced the <a href="http://docs.mongodb.org/manual/applications/aggregation/">aggregation framework</a>, a faster alternative to Map/Reduce for common aggregation operations. If you took a look at the documentation and examples, you may have found the feature intimidating. Once you tame it, this new feature reveals itself as a very powerful beast. So read on to discover its true power through a series of examples.</p>
 <p><img src="/images/370973576_9c1c871c39_b.jpeg" alt="MongoDB New Aggregation Framework And SQL side-By-Side" /></p>
-<h3><!--more-->A Brief Introduction About The Pipeline Syntax</h3>
+<h2><!--more-->A Brief Introduction About The Pipeline Syntax</h2>
 <p>A MongoDB aggregation is a series of special operators applied to a collection. An <em>operator</em> is a JavaScript object with a single property, the operator name, which value is an option object:</p>
 <div class="CodeRay">
   <div class="code"><pre>{ <span class="predefined">$name</span>: { <span class="comment">/* options */</span> } }</pre></div>
@@ -64,7 +64,7 @@ tags:
 
 <p>The main benefit of the aggregation framework is that MongoDB executes it without the overhead of the JavaScript engine. It's implemented directly in C++, and therefore it's very fast. The main limitation - as compared to classical SQL aggregation - is that it&rsquo;s limited to a single collection. In other terms, you can&rsquo;t do a Mongo aggregation <em>on several collections</em> using a JOIN-like operation. Apart from that, it&rsquo;s <em>very</em> powerful.</p>
 <p>In this post, I&rsquo;ll illustrate the power of pipeline operators by example, and compare them to their SQL counterpart. For a detailed reference, go to <a href="http://docs.mongodb.org/manual/reference/aggregation/">docs.mongodb.org</a>.</p>
-<h3>Select, alias, compose</h3>
+<h2>Select, alias, compose</h2>
 <p>Use the <code>$project</code> operator to select or rename properties from a collection - similar to what you would do with the SQL SELECT clause.</p>
 <table width="100%" style="border: none;">
 
@@ -130,7 +130,7 @@ tags:
 
 </table>
 <p>The <code>$project</code> operator can also create composed fields and sub-documents using any of the supported <a href="http://docs.mongodb.org/manual/reference/aggregation/#aggregation-expression-operators">expression operators</a> (<code>$and, $or, $gt, $lt, $eq, $add, $mod, $substr, $toLower, $toUpper, $dayOfWeek, $hour, $cond, $ifNull</code>, to name a few).</p>
-<h3>Grouping documents</h3>
+<h2>Grouping documents</h2>
 <p>Group documents with, as you would have guessed, the <code>$group</code> operator.</p>
 <table width="100%" style="border: none;">
 
@@ -239,7 +239,7 @@ tags:
 </tr>
 
 </table>
-<h3>Multi Operator Pipeline</h3>
+<h2>Multi Operator Pipeline</h2>
 <p>A pipeline can feature more than one operator. Here is a combination of <code>$group</code> and <code>$project</code>:</p>
 <table width="100%" style="border: none;">
 
@@ -281,7 +281,7 @@ tags:
 </tr>
 
 </table>
-<h3>More complex aggregations</h3>
+<h2>More complex aggregations</h2>
 <p><code>$group</code> supports a lot of aggregation functions: <code>$first, $last, $min, $max, $avg, $sum, $push</code>, and <code>$addToSet</code>. Check the <a href="http://docs.mongodb.org/manual/reference/aggregation/#_S_group">MongoDB documentation</a> for a complete reference.</p>
 <table width="100%" style="border: none;">
 
@@ -357,7 +357,7 @@ tags:
 </tr>
 
 </table>
-<h3>Conditions</h3>
+<h2>Conditions</h2>
 <p>You can restrict the collection to be processed using a <a href="http://www.mongodb.org/display/DOCS/Querying">query object</a>, passed to the <code>$match</code> operator. Whether you place this operator before or after a <code>$group</code> operator, it becomes the equivalent of <code>WHERE</code> or <code>HAVING</code> in SQL.</p>
 <table width="100%" style="border: none;">
 
@@ -431,7 +431,7 @@ tags:
 </tr>
 
 </table>
-<h3>Develop Embedded Arrays</h3>
+<h2>Develop Embedded Arrays</h2>
 <p>If documents inside a collection contain arrays, you can develop ("unwind") these arrays into several unique documents using the <code>$unwind</code> operator.</p>
 <table width="100%" style="border: none;">
 
@@ -529,7 +529,7 @@ tags:
 </tr>
 
 </table>
-<h3>Aggregate Developed Arrays</h3>
+<h2>Aggregate Developed Arrays</h2>
 <p>The true power of the aggregation framework reveals when you pipe <code>$unwind</code> to <code>$group</code>. This is similar to using <code>LEFT JOIN ... GROUP BY</code> in SQL.</p>
 <table width="100%" style="border: none;">
 
@@ -605,6 +605,6 @@ tags:
 </tr>
 
 </table>
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>Imagine what you can do with this system... Pipe operators one after the other, group, sort, limit, etc. The ultimate example, taken from <a href="http://docs.mongodb.org/manual/tutorial/aggregation-examples/#average-city-population-by-state">the MongoDB documentation itself</a>, shows a pipeline with two successive <code>$group</code> operators. An SQL database can only do that with subqueries.</p>
 <p>If your Map/Reduce functions are simple enough, refactor your Mongo code to the new aggregation framework. It will execute faster, and open to a new realm of possibility.</p>
