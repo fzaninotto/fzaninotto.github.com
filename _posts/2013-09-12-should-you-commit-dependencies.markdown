@@ -8,6 +8,7 @@ tags:
 - development
 - NodeJS
 - php
+popular: true
 ---
 
 <a href="/images/gavage.jpg"><img src="/images/gavage.jpg" class="postImage"/></a>

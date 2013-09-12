@@ -4,6 +4,7 @@ title: You Should Write Ugly Code
 published: true
 excerpt: Some developers know how to tell beautiful code from ugly code. They will criticize you for writing ugly code. I personally think that developers shouldn't care about code beauty, because that's not their job. Instead, they should focus on creating great products, which is infinitely more satisfying.
 image: /images/ugly_code.jpg
+popular: true
 ---
 
 <a href="/images/ugly_code.jpg"><img src="/images/ugly_code.jpg" title="Code Extract From https://github.com/WordPress/WordPress/blob/4b13a1ffa473dc7547c33953700e054e47fc4b6c/wp-admin/includes/nav-menu.php" class="postImage"/></a>

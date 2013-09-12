@@ -4,6 +4,7 @@ title: Pourquoi Symfony est-il (encore) open-source ?
 published: true
 excerpt: "<i>English speakers: This post is based on the <a href='http://paris2013.live.symfony.com/speakers'>keynote speech I gave</a> during the Symfony Live Paris 2013 conference. It's in French, and too long to be translated. But people from the audience asked me to publish it. Don't be afraid though: this blog is still mostly in English.</i> Symfony paye une partie de votre salaire, et c'est pourtant le résultat d'un don. Mais pas forcément d'un don désintéressé. Après de petits détours philosophiques, sociologiques et économiques, nous verrons si l'Open-Source en général - et Symfony en particulier - sont l'aboutissement du rêve de doux dingues, ou l'amorce d'une nouvelle ère."
 image: /images/symfony_black_03.png
+popular: true
 ---
 
 <blockquote><i>Ce texte, un peu remanié, est issu d'une conférence d'environ 40 minutes que j'ai donnée lors du Symfony Live 2013. Sa longueur et son style en font un ovni sur ce blog - même si la thématique de la motivation de l'open-source a <a href="/2011/11/13/open-source-is-a-gift.html">déjà</a> <a href="/2012/09/12/open-source-relies-on-selfishness.html">été</a> abordée ici.</i></blockquote>

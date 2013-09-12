@@ -6,6 +6,7 @@ tags:
 - NodeJS
 excerpt: "Node.js is well-know for its good connectivity with NoSQL databases. A less know fact is that it's also very efficient with relational databases. Among the dozens ORMs out there in JavaScript, one stands out for relational databases: Sequelize. It's quite easy to learn but there are not many pointers about how to organize model code with this module. Here are a few tips we learned by using Sequelize in a medium size project."
 image: /images/nodejs-mysql.png
+popular: true
 ---
 Node.js is well-know for its good connectivity with NoSQL databases. A less know fact is that it's also very efficient with relational databases. Among the dozens ORMs out there in JavaScript, one stands out for relational databases: [Sequelize](http://www.sequelizejs.com/). It's quite easy to learn but there are not many pointers about how to organize model code with this module. Here are a few tips we learned by using Sequelize in a medium size project.
 

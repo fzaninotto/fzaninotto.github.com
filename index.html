@@ -30,7 +30,8 @@ title: Redo The Web - François Zaninotto's blog
 
 <ul class="posts">
 {% for post in site.posts offset:4 %}
-<li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+<li><span class="date">{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a>
+{% if post.popular %}<span class="label label-success">popular</span>{% endif %}</li>
 {% endfor %}
 </ul>
 
