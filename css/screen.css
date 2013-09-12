@@ -11,18 +11,8 @@
   padding: 0;
 }
 
-html, body {
-  height: 100%;
-}
-
 body {
-  background-color: white;
   font-family: helvetica, arial, clean, sans-serif;
-  text-align: center;
-}
-
-h2, h3, h4, h5, h6 {
-  font-size: 100%;
 }
 
 h1 {
@@ -32,6 +22,16 @@ h1 {
   margin: 1em 0;
 }
 
+.body h1 {
+  margin-top: 1.8em;
+}
+
+h2 {
+  font-size: 1.2em;
+  font-weight: bold;
+  line-height: 1.5em;
+}
+
 h3 {
   font-weight: normal;
   font-style: italic;
@@ -39,14 +39,24 @@ h3 {
 
 p {
   margin: 1em 0;
+  text-align: justify;
+  font-size: 16px;
+}
+
+@media screen and (max-width: 400px) {
+  p {
+    font-size: 14px;
+  }
 }
 
 a {
   color: #00a;
+  text-decoration: underline;
 }
 
 a:hover {
   color: black;
+  text-decoration: none;
 }
 
 a:visited {
@@ -75,29 +85,29 @@ ul.posts {
   margin-bottom: 2em;
 }
 
-  ul.posts li {
-    line-height: 1.75em;
-  }
-
-  ul.posts span {
-    color: #aaa;
-    font-family: Monaco, "Courier New", monospace;
-    font-size: 80%;
-  }
-
-  .postImage {
-    width: 200px;
-    display: block;
-    float: right;
-    margin: 0 0 15px 15px;
-  }
-
-#home p {
-  margin-bottom: 0;
+ul.posts li {
+  line-height: 1.75em;
 }
 
-#home h2 {
-  margin-top: 1em;
+ul.posts span {
+  color: #aaa;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 80%;
+}
+
+.postImage {
+  width: 200px;
+  display: block;
+  float: right;
+  margin: 0 0 15px 15px;
+}
+
+@media screen and (max-width: 400px) {
+  .postImage {
+    width: 100%;
+    float: none;
+    margin: 10px 0;
+  }
 }
 
 /*****************************************************************************/
@@ -106,48 +116,79 @@ ul.posts {
 /*
 /*****************************************************************************/
 
-header {
-  text-align: left;
+.sidebar-container {
+  padding: 0;
+}
+
+.sidebar {
+  text-align: center;
   background: #252525 url('/images/pw_maze_black.png');
   border-right: solid 1px #000;
   bottom: 0;
   left: 0;
-  padding: 1.5em 1em 0 1em;
-  position: fixed;
-  overflow: hidden;
-  top: 0;
-  width: 170px;
-  z-index: 10;
+  padding: 1.5em 1em 1em 1em;
   line-height: 1.5em;
 }
 
-header h1 a, header h1 a:visited {
+.sidebar h1 a, .sidebar h1 a:visited {
   color: white;
   font-weight: bold;
   text-decoration: none;
   margin-bottom: 2em;
 }
 
-header .subtitle {
+@media screen and (max-width: 767px) {
+  .sidebar {
+    padding: 0.1em 0;
+  }
+}
+
+.sidebar .subtitle {
   color: #aaa;
   font-size: 1em;
   margin: 0;
   line-height: 1.2em;
 }
 
-header .subtitle a, header .subtitle a:visited {
+.sidebar .subtitle img {
+  width: 130px;
+  margin: 1em 0 0 0;
+}
+.sidebar .subtitle a, header .subtitle a:visited {
   color: #aaa;
 }
 
-header .subtitle a:hover {
+.sidebar .subtitle a:hover {
   text-decoration: none;
 }
 
-.site {
-  text-align: justify;
-  width: 42em;
-  margin: 3em auto 2em 230px;
-  line-height: 1.5em;
+.sidebar p {
+  text-align: center;
+  line-height: 1.3em;
+}
+
+.arrow-down {
+  width: 0; 
+  height: 0; 
+  border-left: 81px solid transparent;
+  border-right: 81px solid transparent;
+  border-top: 81px solid #000;
+}
+
+@media screen and (max-width: 991px) {
+  .arrow-down {
+    border-left: 93px solid transparent;
+    border-right: 93px solid transparent;
+    border-top: 93px solid #000;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .arrow-down {
+    border-left: 97px solid transparent;
+    border-right: 97px solid transparent;
+    border-top: 97px solid #000;
+  }
 }
 
 .title {
@@ -156,52 +197,52 @@ header .subtitle a:hover {
   margin-bottom: 2em;
 }
 
-  .site .title a {
-    color: #a00;
-    text-decoration: none;
-  }
+.title a {
+  color: #a00;
+  text-decoration: none;
+}
 
-  .site .title a:hover {
-    color: black;
-  }
+.title a:hover {
+  color: black;
+}
 
-  .site .title a.extra {
-    color: #aaa;
-    text-decoration: none;
-    margin-left: 1em;
-  }
+.title a.extra {
+  color: #aaa;
+  text-decoration: none;
+  margin-left: 1em;
+}
 
-  .site .title a.extra:hover {
-    color: black;
-  }
+.title a.extra:hover {
+  color: black;
+}
 
-  .site .rest {
-    margin: 0.2em 0 2em;
-  }
+.rest {
+  margin: 0.5em 0 3em;
+}
 
-  .site .meta {
-    color: #aaa;
-  }
+.meta {
+  color: #aaa;
+}
 
-footer {
+.footer {
   color: #666;
   border-top: 4px solid #eee;
   padding: 10px 0;
-  margin: 2em 20px 20px 240px;
+  text-align: center;
 }
 
-footer li {
+.footer li {
   display: inline;
   list-style: none;
   padding: 8px;
 }
 
-footer img {
+.footer img {
   vertical-align: middle;
   padding-right: 7px;
 }
 
-footer a {
+.footer a {
   color: #8085C1;
 }
 
@@ -211,59 +252,55 @@ footer a {
 /*
 /*****************************************************************************/
 
-#post {
+/* standard */
 
+#post pre {
+  border: 1px solid #ddd;
+  background-color: #eef;
+  overflow: auto;
+  padding: 0.5em;
 }
 
-  /* standard */
-
-  #post pre {
-    border: 1px solid #ddd;
-    background-color: #eef;
-    overflow: auto;
-    padding: 0.5em;
-  }
-
-  #post ul,
-  #post ol {
-    margin-left: 1.35em;
-  }
-
-  #post code {
-    border: 1px solid #ddd;
-    background-color: #eef;
-  }
-
-    #post pre code {
-      border: none;
-      line-height: normal;
-      margin: 0;
-    }
-
-.site .highlight {
-  line-height: 1em;
-  margin-bottom: 1em;
+#post ul,
+#post ol {
+  margin-left: 1.35em;
 }
-  /* terminal */
 
-  #post pre.terminal {
-    border: 1px solid black;
-    background-color: #333;
-    color: white;
-  }
+#post code {
+  border: 1px solid #ddd;
+  background-color: #eef;
+}
 
-  #post pre.terminal code {
-    background-color: #333;
-  }
+#post pre code {
+  border: none;
+  line-height: normal;
+  margin: 0;
+}
+
+.highlight {
+line-height: 1em;
+margin-bottom: 1em;
+}
+/* terminal */
+
+#post pre.terminal {
+  border: 1px solid black;
+  background-color: #333;
+  color: white;
+}
+
+#post pre.terminal code {
+  background-color: #333;
+}
 
 #related {
   margin-top: 2em;
 }
 
-  #related h2 {
-    margin-bottom: 1em;
-  }
+#related h2 {
+  margin-bottom: 1em;
+}
 
 iframe.twitter-share-button {
-  vertical-align: middle;
+vertical-align: middle;
 }
