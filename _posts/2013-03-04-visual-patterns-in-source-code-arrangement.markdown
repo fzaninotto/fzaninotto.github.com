@@ -4,6 +4,7 @@ title: Visual Patterns in Source Code Arrangement
 published: true
 excerpt: If you take a bird's-eye view on a code repository using data visualization techniques, some visual patterns emerge that can help refactoring, team collaboration, and maintenability. This post illustrates a few patterns found using CodeFlower, an open-source code visualization tool I recently released.
 image: /images/codeflower/codeflower.png
+popular: true
 ---
 Source code arrangement is a matter of debate. What would you consider a good practice for the number of lines of code per file, the number of files per directory, the total number of files in a project? To help answer these questions, one must see the big picture: how does a project code look from a bird's eye view? [CodeFlowers](http://redotheweb.com/CodeFlower) are a way to look at code layouts in a graphical way. Using it on various projects, you quickly see some visual patterns emerge.
 
