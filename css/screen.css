@@ -44,13 +44,8 @@ p {
   font-size: 16px;
 }
 
-@media screen and (max-width: 400px) {
-  p {
-    font-size: 14px;
-  }
-  .gist, pre, code {
-    font-size: 12px;
-  }
+li {
+  font-size: 16px;
 }
 
 a {
@@ -76,6 +71,12 @@ blockquote {
   padding: 0 0 0 15px;
   margin: 0 0 20px;
   border-left: 5px solid #eeeeee;
+}
+
+@media screen and (max-width: 400px) {
+  p, li {
+    font-size: 14px;
+  }
 }
 
 /*****************************************************************************/
@@ -263,6 +264,17 @@ ul.posts span.date {
   background-color: #eef;
   overflow: auto;
   padding: 0.5em;
+}
+
+pre, code {
+  font-size: 14px;
+  font-family: Consolas, 'Liberation Mono', Courier, monospace;
+}
+
+@media screen and (max-width: 400px) {
+  .gist, pre, code {
+    font-size: 12px;
+  }
 }
 
 #post ul,
