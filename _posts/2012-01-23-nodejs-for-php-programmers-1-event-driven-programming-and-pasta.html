@@ -93,7 +93,7 @@ saucePan: Tomato sauce is ready</pre></div>
 <p>Translates to JavaScript as:</p>
 <p><script src="https://gist.github.com/649bbfc1a9409c9bd37a.js"></script></p>
 <p>Lastly, Node allows to write dynamic servers, while PHP needs a server on its own (like Apache) to handle the raw HTTP request. That means that a Node server stays in memory and is compiled only once. Compared to mod_php, which loads the entire PHP runtime and all the required scripts for every single HTTP request, that's a big boost.</p>
-<p><strong>Note</strong>: One important JavaScript gotcha PHP programmers should be aware of is the evil nature of the <code>this</code> keyword. I already mentioned it in <a href="http://dotheweb.posterous.com/this-is-not-what-you-think-beware-of-this-in">a previous post</a>.</p>
+<p><strong>Note</strong>: One important JavaScript gotcha PHP programmers should be aware of is the evil nature of the <code>this</code> keyword. I already mentioned it in <a href="http://redotheweb.com/2012/01/10/this-is-not-what-you-think-beware-of-this-in-javascript.html">a previous post</a>.</p>
 <h2>Conclusion</h2>
 <p>Overall, Node.js is faster than PHP, and consumes less memory. However, Node programming becomes increasingly difficult as the server codebase increases, because you then need to synchronize manually. That makes Node suitable for small to medium size servers doing simple operations - REST APIs, for instance, are a good fit.</p>
 <p>To me, Node's true value, besides the event loop, is the new asynchronous implementation of database queries, file operations, HTTP queries, etc. This is pure gold, especially when you realize that other implementations basically waste your CPU cycles.</p>
