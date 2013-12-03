@@ -43,7 +43,7 @@ John's talk was targeted at Java developers who miss the features of a strongly 
 
 John listed tools allowing to check and enforce conventions in JavaScript, from syntax checkers and linters to deeper static analysis tools like [plato](http://jsoverson.github.io/plato/examples/jquery/). This might seem new to JavaScript developers coming from the frontend side, but I think that backend developers have been using such tools in other languages for years, including pre-commit hooks to enforce the rules. Lastly, John introduced TypeScript as THE solution for enforcing types in JavaScript. I personally think that if Java developers don't want to do duck typing, they might as well stay with Java. For me, strong types and strict coding standards only make sense on very large projects, and the JavaScript ecosystem is not completely ready for such projects anyway. 
 
-### Remy Sharp, on IFrames
+### Remy Sharp, on IFrames ([slides](https://speakerdeck.com/rem/iframe-a-less-than-useful-look-at-the-abuse-the-iframe-takes))
 
 A funny and informative talks about all the hacks you can (still) do with iFrames, from achieving cross-domain communication to preventing clickjacking. I can't list all the small hacks he listed, but I'm sure Remy has accumulated a huge experience with iframes while iterating on the [jsbin.com](jsbin.com) service. These hacks would be very useful in 2006, they look less appealing today, even if they still solve actual problems. I think this list of tips would have made a great blog post, easier to bookmark than a conference. But anyway, Remy's talk was entertaining. It's just not the image I want to keep about JavaScript...
 
