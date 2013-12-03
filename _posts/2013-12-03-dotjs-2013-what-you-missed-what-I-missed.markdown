@@ -37,7 +37,7 @@ No need to introduce Addy, famous Googler and JavaScript developer (Yeoman, Todo
 
 I'd like to try out Polymer in the future, but I wonder why two different teams at Google work on similar subjects with different libraries (since Angular has a similar approach with Directives). Anyway, great talk.
 
-### John K Paul, Type Dependence
+### John K Paul, Type Dependence ([slides](http://johnkpaul.github.io/presentations/dotjs/2013/js-tools/))
 
 John's talk was targeted at Java developers who miss the features of a strongly typed language in JavaScript. The assumption that this represented a large share of the audience, was, to me, audacious at best. 
 
