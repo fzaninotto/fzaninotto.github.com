@@ -77,7 +77,7 @@ The performance of Nicolas was to improvise a 25 minutes talk in a single week-e
 
 After a funny preamble, Nicolas introduced Dart, yet another language by Google, which compiles to JavaScript, and focused on performance. Dart is not a superset of JavaScript (that would be TypeScript), it is not a subset either (that would be asm.js). It's just the language that Google would like us to use instead of JavaScript for the web. They have developed a runtime which executes Dart about twice as fast as the equivalent JavaScript, only in Chrome. Frankly, considering the size of the JavaScript ecosystem, I don't see us switch to Dart. Especially when a simple "Hello, World" in Dart compiles to 2,500 bytes of JavaScript. 
 
-### Alex Sexton, "Practicing Safe Script"
+### Alex Sexton, "Practicing Safe Script" ([slides](https://speakerdeck.com/slexaxton/practicing-safe-script))
 
 An informative and entertaining talk about web security, how important and how hard it is. Some of the great quotes I heard from this talk: to reach a good security level, "all you have to do is never make a single mistake", which is impossible since security specialists "discount the probability of perfection".
 
