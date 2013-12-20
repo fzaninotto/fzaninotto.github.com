@@ -22,7 +22,7 @@ layout: nil
    <summary>{{ post.excerpt | strip_html | xml_escape }}</summary>
    <content type="html">
     <![CDATA[
-    {{ post.content | xml_escape }}
+    {{ post.content }}
     ]]>
    </content>
  </entry>
