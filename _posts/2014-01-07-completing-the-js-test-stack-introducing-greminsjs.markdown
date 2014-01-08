@@ -55,7 +55,7 @@ gremlins.createHorde().unleash();
 
 You will see gremlins actions on screen, and the errors they trigger on the console: 
 
-![Gremlins in action](https://github-camo.global.ssl.fastly.net/5895c92cb175ca71bf580802e1af3a15a7046b69/687474703a2f2f6d61726d656c61622e636f6d2f6772656d6c696e732e6a732f696d672f746f646f2e676966)
+![Gremlins in action](/images/todo.gif)
 
 You can customize everything. How many gremlins are unleashed, what type of actions they do, the attack strategy they use, everything. Gremlins, in this library, are just plain JavaScript functions. So it's very easy to create new gremlins, specially trained to break your own application:
 
