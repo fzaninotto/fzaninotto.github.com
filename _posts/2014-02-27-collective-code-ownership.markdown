@@ -3,10 +3,10 @@ layout: post
 title: "Choose Collective Code Ownership"
 published: true
 excerpt: "Strong Code ownership, or development silos, is often seen as a good practice. How come it's also one of the most counterproductive project management techniques in an agile team?"
-image: /images/Abc-jackson5.jpg
+image: /images/Ralls_Texas_Grain_Silos_2010.jpg
 ---
 
-<img src="/images/Abc-jackson5.jpg" class="postImage" title="Alice, Bob, and Charles"/>
+<a title="Silos by Leaflet (Own work) [CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0)], via Wikimedia Commons" href="http://commons.wikimedia.org/wiki/File%3ARalls_Texas_Grain_Silos_2010.jpg"><img src="/images/Ralls_Texas_Grain_Silos_2010.jpg" class="postImage"/></a>
 
 Most developers "own" portions of the applications they work on. Also known as "Strong Code Ownership", or simply "Code Ownership", this is often seen as a good practice. How come it's also one of the most counterproductive project management techniques in an agile team?
 
@@ -48,7 +48,7 @@ From a skills and experience point of view, it makes perfect sense to let each d
 
 Consequently, each team member starts developing a strong sense of ownership on certain portions of the code. This will undoubtedly lead to a better productivity, right?
 
-<div style="text-align: center"><a title="Silos by Leaflet (Own work) [CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0)], via Wikimedia Commons" href="http://commons.wikimedia.org/wiki/File%3ARalls_Texas_Grain_Silos_2010.jpg"><img width="512" alt="Ralls Texas Grain Silos 2010" src="//upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Ralls_Texas_Grain_Silos_2010.jpg/512px-Ralls_Texas_Grain_Silos_2010.jpg"/></a></div>
+<a title="Silos by SimonP (Own work) [CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0) or GFDL (http://www.gnu.org/copyleft/fdl.html)], via Wikimedia Commons" href="http://commons.wikimedia.org/wiki/File%3AVictory_Silos.JPG"><img alt="Victory Silos" src="//upload.wikimedia.org/wikipedia/commons/thumb/2/27/Victory_Silos.JPG/512px-Victory_Silos.JPG"/></a>
 
 ## Code Ownership Prevents Business-Driven Priority
 
