@@ -100,7 +100,7 @@ Charles could have given Bob advice if he had reviewed his code from the beginni
 
 ## Code Ownership Prevents Mutual Assistance
 
-<div style="width:256px;float:left;margin: 10px 10px 10px 0"><a title="Silos by Historiker (Own work) [CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0)], via Wikimedia Commons" href="http://commons.wikimedia.org/wiki/File%3AJuvelkvarnens_silo.jpg"><img width="256" alt="Juvelkvarnens silo" src="//upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Juvelkvarnens_silo.jpg/256px-Juvelkvarnens_silo.jpg"/></a></div>
+<div style="width:256px;float:left;margin: 10px 10px 10px 0"><a title="Silos by Jordi Boggiano, courtesy of the author" href="https://twitter.com/seldaek/status/439315419065618433"><img style="width:256px" src="/images/jordi_silo.jpg"/></a></div>
 
 Bob comes back from holidays with a nice tan. He's surprised that his colleagues feel much less relaxed than him.
 
