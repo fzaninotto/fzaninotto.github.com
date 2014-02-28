@@ -7,6 +7,7 @@ image: /images/gremlins.png
 tags:
 - JavaScript
 - test
+popular: true
 ---
 
 <img src="/images/gremlins.png" class="postImage"/>

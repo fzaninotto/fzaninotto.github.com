@@ -7,6 +7,7 @@ image: /images/Credit_Cards.jpg
 tags:
 - faker
 - php
+popular: true
 ---
 
 <img src="/images/Credit_Cards.jpg" class="postImage"/>
