@@ -7,6 +7,7 @@ image: /images/sflive2014.jpg
 tags:
 - Symfony
 - Agile
+popular: true
 ---
 <a href="https://twitter.com/ParisMikael/status/453502248270966784"><img src="/images/sflive2014.jpg" class="postImage" title="Picture of François Zaninotto's talk at Symfony Live Paris 2014 Conference by @ParisMikael"/></a>
 

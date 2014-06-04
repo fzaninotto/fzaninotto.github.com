@@ -4,6 +4,7 @@ title: "Choose Collective Code Ownership"
 published: true
 excerpt: "Strong Code ownership, or development silos, is often seen as a good practice. How come it's also one of the most counterproductive project management techniques in an agile team?"
 image: /images/Ralls_Texas_Grain_Silos_2010.jpg
+popular: true
 ---
 
 <a title="Silos by Leaflet (Own work) [CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0)], via Wikimedia Commons" href="http://commons.wikimedia.org/wiki/File%3ARalls_Texas_Grain_Silos_2010.jpg"><img src="/images/Ralls_Texas_Grain_Silos_2010.jpg" class="postImage"/></a>
