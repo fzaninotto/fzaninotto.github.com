@@ -17,7 +17,7 @@ Six months after the previous release, here is a better and improved [Faker](htt
 
 ### Real Text Generator
 
-I've already blogged about it, and this is the major highlight of Faker 1.4. [Faker now offers a `realTest` formatter](2014/03/04/faker-generates-real-text.html), based on Markov Chains, to generate "almost understandable" text for your preferred locale.
+I've already blogged about it, and this is the major highlight of Faker 1.4. [Faker now offers a `realTest` formatter](/2014/03/04/faker-generates-real-text.html), based on Markov Chains, to generate "almost understandable" text for your preferred locale.
 
 ```php
 <?php
