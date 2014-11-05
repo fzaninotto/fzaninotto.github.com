@@ -7,6 +7,8 @@ image: /images/symfony_black_03.png
 popular: true
 ---
 
+<iframe width="560" height="315" src="//www.youtube.com/embed/JXoO4RwZRbw" frameborder="0" allowfullscreen></iframe>
+
 <blockquote><i>Ce texte, un peu remanié, est issu d'une conférence d'environ 40 minutes que j'ai donnée lors du Symfony Live 2013. Sa longueur et son style en font un ovni sur ce blog - même si la thématique de la motivation de l'open-source a <a href="/2011/11/13/open-source-is-a-gift.html">déjà</a> <a href="/2012/09/12/open-source-relies-on-selfishness.html">été</a> abordée ici.</i></blockquote>
 
 <img src="/images/symfony_black_03.png" title="Official Symfony Logo" class="postImage"/>
