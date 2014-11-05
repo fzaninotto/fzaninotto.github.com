@@ -17,7 +17,7 @@ Et voici le support de la présentation :
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/40692737" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> 
 
-Si vous êtes d'accord, si vous n'êtes pas d'accord, si vous voulez vous adhérer, réagissez ! en postant un commentaire ci-dessous, ou [sur joind.in](https://joind.in/talk/view/11955).
+Si vous êtes d'accord, si vous n'êtes pas d'accord, si vous voulez adhérer, réagissez ! en postant un commentaire ci-dessous, ou [sur joind.in](https://joind.in/talk/view/11955).
 
 Vive la Parti de l'Innovation !
 
