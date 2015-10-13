@@ -107,6 +107,12 @@ ul.posts span.date {
   margin: 0 0 15px 15px;
 }
 
+img.medium {
+  display: block;
+  width: 90%;
+  margin: 20px auto;
+}
+
 @media screen and (max-width: 400px) {
   .postImage {
     width: 100%;
@@ -173,8 +179,8 @@ ul.posts span.date {
 }
 
 .arrow-down {
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-left: 81px solid transparent;
   border-right: 81px solid transparent;
   border-top: 81px solid #000;
