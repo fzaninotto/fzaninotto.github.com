@@ -238,7 +238,7 @@ This approach works for the `GET /accounts`, and all subsequent calls to the API
 [Cross-Site request Forgery](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) attacks work across two sites: a malicious / infected site (e.g. xxxtorrentz.com), and the site/API where the user has credentials (api.bobank.com). When Bob visits the infected site, he may not notice the following image:
 
 ```html
-<img src="https://api.bobank.com/transfer?amout=10000?to=34523454561" style="width:0;height:0" />
+<img src="https://api.bobank.com/transfer?amout=10000&to=34523454561" style="width:0;height:0" />
 ```
 
 If Bob authenticated to api.bobank.com in the past, every request he makes to the same address contains the session cookie. So the malicious call for a money transfer will pass authentication.
