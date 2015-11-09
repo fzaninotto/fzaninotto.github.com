@@ -7,6 +7,7 @@ image: /images/crowd_small.png
 tags:
 - faker
 - php
+popular: true
 ---
 
 Yep, it's here. Almost a year after the previous release, Faker 1.5 has been released, with a ton and a half of new fake data, ridiculously useful new formatters, new locales, and bug fixes. Ready to dive in?

@@ -7,6 +7,7 @@ image: /images/francois_president_small.jpg
 tags:
 - Symfony
 - PHP
+popular: true
 ---
 
 Le 24 octobre dernier, au cours du [Forum PHP 2014](http://www.afup.org/pages/forumphp2014/sessions.php), j'ai eu le plaisir de donner une conférence sur le thème de l'architecture des applications web, du choix des frameworks, et de l'influence de la politique sur la vie des développeurs. En voici la vidéo en intégralité (38 minutes).
