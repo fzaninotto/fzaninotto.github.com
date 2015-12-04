@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-title: "I Hate JavaScript"
+title: "\"I Hate JavaScript\""
 excerpt: "Oh really, you hate JavaScript? Or maybe you hate PHP? Or a specific framework for a specific language. Let me challenge that hate. Or better, let me talk about love instead."
 image: images/love_hate.jpg
 tags:
