@@ -10,9 +10,9 @@
    <meta name="twitter:site" content="@francoisz" />
    <meta name="twitter:creator" content="@francoisz" />
    <meta property="og:url" content="http://www.redotheweb.com{{ page.url }}" />
-   <meta property="og:title" content="{{ page.title }}" />
+   <meta property="og:title" content="{{ page.title | xml_escape }}" />
    <meta property="og:description" content="{{ page.excerpt | strip_html | truncate:200 }}" />
-   <meta property="og:image" content="http://www.redotheweb.com{{ page.image }}" />
+   <meta property="og:image" content="http://www.redotheweb.com/{{ page.image }}" />
    <meta name="google-site-verification" content="5_xTjdR9CzUX0mzpUtja3J3Li_Vlc8vY0f3NqfMOHDA" />
    <link href="/atom.xml" rel="alternate" title="Redo The Web" type="application/atom+xml" />
    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
