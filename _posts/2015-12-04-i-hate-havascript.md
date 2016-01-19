@@ -59,7 +59,7 @@ Let's go back to today. The MVC architecture, once a (rediscovered) breakthrough
 
 ## Learn To Love the (Tech) Differences
 
-We can learn something new from every language. [Scala](http://www.scala-lang.org/) makes functional programming obvious. [Flux](https://facebook.github.io/flux/) simplifies the update workflow of user interfaces like never before. [WinDev](http://www.pcsoft.fr/windev/) uses French to name functions, which is great for programmers who never learned English (and love naked women). When I meet someone doing something else than what I do, I try to detect the good ideas, the good practices that I could reuse. I love to learn from other people's experiences.
+We can learn something new from every language. [Scala](http://www.scala-lang.org/) makes functional programming obvious. [Flux](https://facebook.github.io/flux/) simplifies the update workflow of user interfaces like never before. [WinDev](http://www.pcsoft.fr/windev/) uses French to name functions, which is great for programmers who never learned English. When I meet someone doing something else than what I do, I try to detect the good ideas, the good practices that I could reuse. I love to learn from other people's experiences.
 
 I dream about a tech conference that would not be centered around a particular technology. A tech conference mixing several developer cultures, without any preconception, but a single purpose: open our minds.
 
