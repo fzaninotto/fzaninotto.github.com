@@ -23,7 +23,7 @@ It makes me sad.
 
 "_I hate Node.js: it's based on a language that was written in 10 days by a guy called Brendan_". Wake up dude, JavaScript has evolved a lot since then. Take a look at [ES2015](https://babeljs.io/docs/learn-es2015/), it's a joy to read and write.
 
-"_I hate PHP, it has curly braces_". It also has some of the most active open-cource communities, [awesome frameworks](http://symfony.com) and libraries, maintained for real by passionate and skilled developers.
+"_I hate PHP, it has curly braces_". It also has some of the most active open-source communities, [awesome frameworks](http://symfony.com) and libraries, maintained for real by passionate and skilled developers.
 
 "_I hate PHP, it's so slow_". Unless you learn to profile your code correctly, and detect the bottlenecks you added by mistake, or switch to a faster implementation (PHP7, HHVM). Did you know that [PHP powers Facebook](https://www.facebook.com/notes/facebook-engineering/speeding-up-php-based-development-with-hiphop-vm/10151170460698920)?
 
