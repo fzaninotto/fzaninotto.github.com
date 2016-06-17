@@ -21,3 +21,5 @@ Et voici le support de la présentation :
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/6rurKr02A1WbU8" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
 
 Si vous êtes d'accord, si vous n'êtes pas d'accord, si vous voulez ajouter quelque chose, je vous invite à poster un commentaire ci-dessous, ou [sur joind.in](https://joind.in/event/php-tour-clermont-ferrand-2016/le-jeu-vido--la-rescousse-du-web).
+
+Merci à l'AFUP et à tous les volontaires pour l'organisation, comme toujours au top. Et merci au public pour son soutien et sa tolérance pour un talk qui ne parle pas de PHP dans une conférence PHP!
