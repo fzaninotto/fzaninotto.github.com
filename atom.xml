@@ -1,3 +1,5 @@
+---
+---
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
@@ -10,7 +12,7 @@
    <name>François Zaninotto</name>
  </author>
 
- {% for post in site.posts %}
+ {% for post in site.posts limit:10 %}
  <entry>
    <title>{{ post.title }}</title>
    <link href="http://www.redotheweb.com{{ post.url }}"/>
