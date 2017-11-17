@@ -17,4 +17,8 @@ Voici le support et les notes de présentation :
 
 <iframe src="http://www.slideshare.net/slideshow/embed_code/33312299" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px 1px 0; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="https://fr.slideshare.net/francoisz/la-migration-continue-vers-symfony" title="La migration continue vers Symfony" target="_blank">La migration continue vers Symfony</a> </strong> from <strong><a href="http://www.slideshare.net/francoisz" target="_blank">Francois Zaninotto</a></strong> </div>
 
+La conférence a également été captée, et est visible sur YouYube.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CvPD9iG0w-E" frameborder="0" allowfullscreen></iframe>
+
 J'ai été ravi de participer à cette conférence avec tous les collaborateurs de marmelab, de la qualité de l'organisation et des talks. Un grand merci à l'accueil du public pour ma présentation, qui m'a vraiment fait chaud au coeur. 
