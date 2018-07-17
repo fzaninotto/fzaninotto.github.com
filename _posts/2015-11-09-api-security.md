@@ -138,7 +138,7 @@ To be safe from XSS attacks, the application script (whether client-side or serv
 
 But in modern web applications, developers usually rely on many third-party scripts that they can't control. Are you sure that this fancy animation library that you grabbed from bower always escapes `<` and `>` properly? And this CDN serving A/B testing code, hasn't it been compromised lately? Even if you don't use external JS libraries, maybe a simple bug in your browser can create XSS vulnerability (a.k.a [Universal XSS](http://www.zdnet.com/article/severe-xss-flaw-in-fully-patched-microsoft-internet-explorer-discovered/)).
 
-The bottomline is: session storage (and local storage) isn't safe. Any serious penetretion test marks usage of web storage for authentication token as a serious vulnerability. Many banking and insurance organizations forbid web storage for this reason.
+The bottomline is: session storage (and local storage) isn't safe. Any serious penetration test marks usage of web storage for authentication token as a serious vulnerability. Many banking and insurance organizations forbid web storage for this reason.
 
 ## Session Cookie Storage
 
